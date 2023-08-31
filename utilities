@@ -1,0 +1,12 @@
+#ifndef UTILITIES
+#define UTILITIES
+#include "type_definitions.hpp"
+#include "buffer.hpp"
+#include "envinronment.hpp"
+#include "exceptions.hpp"
+#include "file.hpp"
+#include "json.hpp"
+#include "string.hpp"
+#include "logging.hpp"
+#include "events.hpp"
+#endif // UTILITIES
