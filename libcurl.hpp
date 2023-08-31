@@ -23,7 +23,7 @@ namespace Utilities
 		static constexpr const char UserAgent[] = "libcurl/8.0";
 	
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief Error occured into CURL code.
 		*/
 		struct curl_error : public std::runtime_error
@@ -34,7 +34,7 @@ namespace Utilities
 			curl_error(CURLcode code, string msg) : std::runtime_error(msg), Code(code) {}
 		};
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief CURL initialization failed.
 		*/
 		struct curl_not_initied_exception : public std::runtime_error 
@@ -42,7 +42,7 @@ namespace Utilities
 			curl_not_initied_exception() :std::runtime_error("") {}
 		};
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief Not enought memory.
 		*/
 		struct out_of_memory_exception : public std::runtime_error 

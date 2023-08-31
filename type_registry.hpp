@@ -42,7 +42,7 @@ namespace Utilities
 		std::list<interface_item> const& get_types() const { return _types; }
 	
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief This function register instance of interface implementation via creating new instance.
 		*/
 		template<class TDerivedType, typename... Args>

@@ -22,7 +22,7 @@ namespace HTTP
 	using namespace Utilities;
 
 	/*!
-	* @author mik@weareway.com (developer08)
+	* @author multfinite@gmail.com (multfinite)
 	* @brief An error occured by service code. This error class provides some functions to provide information to HttpEndpoint about responding.
 	*/
 	struct service_error : public Exceptions::base_error
@@ -30,26 +30,26 @@ namespace HTTP
 		service_error(string function, string file, int line) : Exceptions::base_error("An unknown service error", function, file, line) {}
 		service_error(string msg, string function, string file, int line) : Exceptions::base_error(msg, function, file, line) { }
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief HTTP status code which will be sent back with response.
 		* @return [int64_t] HTTP response code.
 		*/
 		virtual int64_t										get_code()		const { return INTERNAL_SERVER_ERROR; }
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief HTTP status code which will be sent back with response.
 		* @return [int64_t] HTTP response code.
 		*/
 		virtual nlohmann::json							get_detail()	const { return nlohmann::json::parse("{}"); }
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief Should be exception thrown.
 		* @return [boolean] if true exception will be raised, otherwise false.
 		*/
 		virtual bool											raise()			const { return false; }
 	};
 	/*!
-	* @author mik@weareway.com (developer08)
+	* @author multfinite@gmail.com (multfinite)
 	* @brief class which stores information about http response
 	*/
 	struct HttpResponse
@@ -60,7 +60,7 @@ namespace HTTP
 	};
 
 	/*!
-	* @author mik@weareway.com (developer08)
+	* @author multfinite@gmail.com (multfinite)
 	* @brief This class provides basic HTTP handlers & logging. 
 	* @param TService is class which implement all internal lofic of application. It must have implement write_access_log(json information, string sourceAddress, int16_t tag, TData& data). 
 	* @param TData is class which stores information to communicate between HttpEndpoint and TService. It will be passed to handler functions.
@@ -73,27 +73,27 @@ namespace HTTP
 	public:
 		using TServiceConstructor = TService::_constructor;
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief shared_ptr of restbed::Request
 		*/
 		using HttpRequest						= std::shared_ptr<const restbed::Request>;
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief shared_ptr of restbed::Session
 		*/
 		using HttpSession						= shared_ptr<Session>;
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief Handler function type for endpoint which not require request content.
 		*/
 		using EndpointHandler				= std::function<void(const HttpSession session, TService& service, HttpResponse& response, bool& autosend, TData& data)>;
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief Handler function type for endpoint which require request content (with fetching).
 		*/
 		using FetchedEndpointHandler		= std::function<void(const HttpSession session, string content, TService& service, HttpResponse& response, bool& autosend, TData& data)>;
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief creates content for error response
 		* @return [object]
 		{
@@ -109,7 +109,7 @@ namespace HTTP
 			return body;
 		}
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief add json markers for response
 		*/
 		static void init_json_content_headers(std::multimap<std::string, std::string>& headers, string& content)
@@ -158,7 +158,7 @@ namespace HTTP
 		}
 
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief This function creates handler for restbed Resource and provides basic functional for logging, responding and exception handling. This version without content fetching.
 		* @param [int16_t] tag - identifier of this procedure
 		* @param [string] method 
@@ -242,7 +242,7 @@ namespace HTTP
 			return *this;
 		}
 		/*!
-		* @author mik@weareway.com (developer08)
+		* @author multfinite@gmail.com (multfinite)
 		* @brief This function creates handler for restbed Resource and provides basic functional for logging, responding and exception handling. This version with content fetching.
 		* @param [int16_t] tag - identifier of this procedure
 		* @param [string] method
