@@ -11,6 +11,8 @@
 #include <strsafe.h>
 #include <tlhelp32.h>
 
+#include "string.hpp"
+
 namespace Utilities
 {
 	constexpr auto BufSize = 512;
@@ -112,41 +114,80 @@ namespace Utilities
 		throw;
 	}
 
-	inline std::string ExtractOriginalFilename(HANDLE hProcess, HMODULE hModule)
+	struct FileVersionInformation
 	{
-		std::string originalFileName{};
-		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetProcessId(hProcess));
-		if (hSnap != INVALID_HANDLE_VALUE)
-		{
-			MODULEENTRY32 moduleEntry{ };
-			moduleEntry.dwSize = sizeof(moduleEntry);
-			if (Module32First(hSnap, &moduleEntry))
-			{
-				do
-				{
-					if (moduleEntry.hModule != hModule)
-						continue;
+		struct fvi_load_error : std::exception {};
+		
+		bool				Loaded				= false;
+		std::string		Comments;
+		std::string		CompanyName;
+		std::string		FileDescription;
+		std::string		FileVersion;
+		std::string		InternalName;
+		std::string		LegalCopyright;
+		std::string		LegalTrademarks;
+		std::string		OriginalFilename;
+		std::string		PrivateBuild;
+		std::string		ProductName;
+		std::string		ProductVersion;
+		std::string		SpecialBuild;
 
-					DWORD _useless;
-					DWORD infoBufferSize = GetFileVersionInfoSize(moduleEntry.szModule, &_useless);
-					if (infoBufferSize == 0)
-						continue;
-					std::vector<char> infoBuffer(infoBufferSize);
-					if (!GetFileVersionInfo(moduleEntry.szModule, NULL, infoBufferSize, infoBuffer.data()))
-						continue;
-					LPVOID nameBuffer;
-					unsigned int nameBufferSize;
-					// 0409 04b0 is language: English (American), codepage: UTF-16
-					if (!VerQueryValue(infoBuffer.data(), "\\StringFileInfo\\040904b0\\OriginalFilename", &nameBuffer, &nameBufferSize))
-						continue;
-					
-					originalFileName = (const char*) nameBuffer;
-					break;
-				} while (Module32Next(hSnap, &moduleEntry));
+		void Load(std::string fileName)
+		{
+			std::string			vfiTranslation	= "\\VarFileInfo\\Translation";
+			std::string			sfiPattern		= "\\StringfileInfo\\%04x%04x\\%s";
+
+			OFSTRUCT			uselessOF;
+			auto					l					= [&](HANDLE* p) { if (p && *p) CloseHandle(*p); };
+			auto					h					= (HANDLE)OpenFile(fileName.c_str(), &uselessOF, OF_READ);
+			std::unique_ptr<HANDLE, decltype(l)> file{ &h, l };
+			
+			DWORD				useless;
+			DWORD				sz[2]; 
+									sz[0]				= GetFileSize(file.get(), &sz[1]);
+			if(sz[0] == 0 && sz[1] == 0)
+				throw fvi_load_error{};
+			size_t				size				= sz[0];
+			size_t				bufferSize		= GetFileVersionInfoSize(fileName.c_str(), &useless);
+			if (bufferSize == 0)
+				throw fvi_load_error{};
+			std::string			buffer; buffer.resize(bufferSize);
+			if (!GetFileVersionInfo(fileName.c_str(), NULL, buffer.size(), buffer.data()))
+				throw fvi_load_error{};
+			uint16_t*			langInfo;
+			uint32_t			cbLang;
+			if (!VerQueryValue(buffer.data(), vfiTranslation.c_str(), (LPVOID*) &langInfo, &cbLang))
+				throw fvi_load_error{};
+
+			std::map<std::string, std::string&> properties
+			{
+				{ "Comments"				,	Comments				},
+				{ "CompanyName"			,	CompanyName		},
+				{ "FileDescription"			,	FileDescription		},
+				{ "FileVersion"				,	FileVersion				},
+				{ "InternalName"			,	InternalName			},
+				{ "LegalCopyright"			,	LegalCopyright		},
+				{ "LegalTrademarks"		,	LegalTrademarks	},
+				{ "OriginalFilename"		,	OriginalFilename		},
+				{ "PrivateBuild"				,	PrivateBuild			},
+				{ "ProductName"			,	ProductName			},
+				{ "ProductVersion"			,	ProductVersion		},
+				{ "SpecialBuild"				,	SpecialBuild			},
+			};
+
+			for (auto& p : properties)
+			{
+				LPVOID			nameBuffer;
+				unsigned int	nameBufferSize;
+				std::string		sfi					= string_format(sfiPattern, langInfo[0], langInfo[1], p.first.c_str());
+				if (!VerQueryValue(buffer.data(), sfi.c_str(), &nameBuffer, &nameBufferSize))
+					continue;
+				p.second.resize(nameBufferSize);
+				memcpy(p.second.data(), nameBuffer, nameBufferSize);
+				p.second.resize(strlen(p.second.data()));
 			}
+			Loaded	= true;
 		}
-		CloseHandle(hSnap);
-		return originalFileName;
-	}
+	};
 }
 #endif //UTILITIES_WINAPI_UTITLITIES_HPP
