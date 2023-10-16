@@ -212,7 +212,7 @@ namespace Utilities
 			{
 				curl_free(output);
 				curl_easy_cleanup(curl);
-				throw new_base_error(Exceptions::base_error, "null result");
+				throw construct_error(Exceptions::base_error, "null result");
 			}
 			string escaped = output;
 			curl_easy_cleanup(curl);

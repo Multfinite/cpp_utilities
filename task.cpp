@@ -42,7 +42,7 @@ namespace Utilities
 			size_t			size	= ssErr.tellp();
 			string			err; err.resize(size);
 			ssErr.read((char*) err.data(), err.size());
-			throw new_base_error_args(execution_error, err, exitStatus);
+			throw construct_error_args(execution_error, err, exitStatus);
 		}
 		else
 		{

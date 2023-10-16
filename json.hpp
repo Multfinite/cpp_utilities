@@ -71,7 +71,7 @@ namespace Utilities
             std::advance(key, i);
     
             if (!j.contains(*key))
-                throw new_base_error(Exceptions::base_error, verifiedPath.str() + " OF " + path);
+                throw construct_error(Exceptions::base_error, verifiedPath.str() + " OF " + path);
             j = j[*key];
     
             if (i > 0)
@@ -88,6 +88,21 @@ namespace Utilities
             return (T)j[key];
         return defaultValue;
     }
+
+    template<typename T>
+    inline auto json_compatible(T& value) { return value; }
+
+    template<>
+    inline auto json_compatible<std::chrono::system_clock::time_point>(std::chrono::system_clock::time_point& value)
+    { 
+        return std::chrono::duration_cast<std::chrono::microseconds>(value.time_since_epoch()).count(); 
+    }
+
+    template<>
+    inline auto json_compatible<  std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds>>(std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds>& value)
+    {
+        return std::chrono::duration_cast<std::chrono::microseconds>(value.time_since_epoch()).count();
+    }  
 }
 
 #define validate_json_object_(item, requiredKeys) Utilities::validate_json_object(__FUNCTION__, __FILE__, __LINE__, item, requiredKeys)

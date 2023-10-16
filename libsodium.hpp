@@ -1,5 +1,5 @@
-#ifndef LIBSODIUM_HPP
-#define LIBSODIUM_HPP
+#ifndef UTILITIES_LIBSODIUM_HPP
+#define UTILITIES_LIBSODIUM_HPP
 
 #include <string>
 #include <cmath>
@@ -27,7 +27,7 @@ class libsodium
 		{
 			_code = sodium_init();
 			if (_code < 0)
-				throw new_base_error_args_no_msg(init_failed, _code);
+				throw construct_error_args_no_msg(init_failed, _code);
 	
 			auto pk_len = crypto_box_PUBLICKEYBYTES;
 			auto sk_len = crypto_box_SECRETKEYBYTES;
@@ -127,4 +127,4 @@ class libsodium
 	};
 }
 
-#endif
+#endif //UTILITIES_LIBSODIUM_HPP

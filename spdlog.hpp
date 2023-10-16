@@ -44,7 +44,7 @@ namespace Utilities
 			auto txt = msg.dump();
 			spdlog::warn(txt);
 		}
-		inline void construct_error(json& msg)
+		inline void error(json& msg)
 		{
 			auto txt = msg.dump();
 			spdlog::error(txt);

@@ -9,6 +9,7 @@
 #include "type_definitions.hpp"
 #include "logging.hpp"
 #include "exceptions.hpp"
+#include "exceptions.rest.hpp"
 
 #include <date/date.h>
 #include <libpq-fe.h>
@@ -20,34 +21,8 @@ namespace HTTP
 	using namespace restbed;
 	using restbed::Service;
 	using namespace Utilities;
+	using Exceptions::REST::service_error;
 
-	/*!
-	* @author multfinite@gmail.com (multfinite)
-	* @brief An error occured by service code. This error class provides some functions to provide information to HttpEndpoint about responding.
-	*/
-	struct service_error : public Exceptions::base_error
-	{
-		service_error(string function, string file, int line) : Exceptions::base_error("An unknown service error", function, file, line) {}
-		service_error(string msg, string function, string file, int line) : Exceptions::base_error(msg, function, file, line) { }
-		/*!
-		* @author multfinite@gmail.com (multfinite)
-		* @brief HTTP status code which will be sent back with response.
-		* @return [int64_t] HTTP response code.
-		*/
-		virtual int64_t										get_code()		const { return INTERNAL_SERVER_ERROR; }
-		/*!
-		* @author multfinite@gmail.com (multfinite)
-		* @brief HTTP status code which will be sent back with response.
-		* @return [int64_t] HTTP response code.
-		*/
-		virtual nlohmann::json							get_detail()	const { return nlohmann::json::parse("{}"); }
-		/*!
-		* @author multfinite@gmail.com (multfinite)
-		* @brief Should be exception thrown.
-		* @return [boolean] if true exception will be raised, otherwise false.
-		*/
-		virtual bool											raise()			const { return false; }
-	};
 	/*!
 	* @author multfinite@gmail.com (multfinite)
 	* @brief class which stores information about http response
@@ -234,7 +209,7 @@ namespace HTTP
 						receivedTime, handledTime,
 						session, service, exception
 					);
-					_spdlog->construct_error(msg);
+					_spdlog->error(msg);
 
 					throw ex;
 				}
@@ -323,7 +298,7 @@ namespace HTTP
 							receivedTime, handledTime,
 							session, service, exception
 						);
-						_spdlog->construct_error(msg);
+						_spdlog->error(msg);
 
 						throw ex;
 					}
