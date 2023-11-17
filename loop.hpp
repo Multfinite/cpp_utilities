@@ -4,98 +4,144 @@
 #include "type_definitions.hpp"
 #include "item_lock.hpp"
 #include "obtainable_item.hpp"
+#include "buffered_collection.hpp"
 
 #include <queue>
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <semaphore>
 
 namespace Utilities::Threading
 {
 	using std::thread;
 	using std::mutex;
-	using std::binary_semaphore;
+	using std::unique_lock;
 	using std::scoped_lock;
+	using std::lock_guard;
+	using std::condition_variable;
+	using std::binary_semaphore;
 
 	using Utilities::item_lock;
 	using Utilities::obtainable_item;
+	using Utilities::buffered_list;
 
-	template<typename TCallable, typename TContext, typename TItem>
+	template<typename TContext, typename TItem>
+	struct WorkerBody
+	{
+		using context_type = TContext;
+		using item_type = TItem;
+		// buffered_list should be swapped after all done
+		//using item_queue_type = buffered_list<item_type>;
+		using item_queue_type = std::list<item_type>;
+
+		item_queue_type Queue;
+		context_type Context;
+		std::mutex Mutex;
+
+		WorkerBody() = default;
+		//WorkerBody(const WorkerBody& rhs) : Queue(rhs.Queue), Context(rhs.Context) {}
+		template<typename ...TArgs> WorkerBody(TArgs&&... args) : Queue(), Context(args...) {}
+	};
+
+	template<typename TCallable, typename TWorkerBody>
 	class Worker
 	{
 	public:
-		using context_type = TContext;
 		using callable_type = TCallable;
-		using item_type = TItem;
-		using item_queue_type = std::queue<item_type>;
-
-		std::binary_semaphore InternalSemaphore;
+		using body_type = TWorkerBody;
+		using self_type = Worker<callable_type, body_type>;
+		//using function_type = std::function<void(body_type& body)>;
+		
+		std::mutex cvm;
+		std::condition_variable cv;
 	private:
+		thread::id _threadId;
 		bool _terminate = false;
 		bool _terminated = false;
 
-		std::thread _thread;
-		std::mutex _queueLock;
-		std::mutex _contextLock;
-
-		/* void callable(context_type& context, std::mutex& contextLock, item_queue_type& queue, std::mutex& queueLock); */
+		std::shared_ptr<std::thread> _thread;
 		callable_type _callable;
-		context_type _context;
-		item_queue_type _queue;
+
+		std::shared_ptr<body_type> _body;
 
 		void _loop()
 		{
+			_threadId = std::this_thread::get_id();
 			while (true)
-			{
-				_queueLock.lock();
-				if (_queue.empty())
-				{
-					_queue.unlock();
-					InternalSemaphore.acquire();
-				}
+			{				
+				unique_lock lk { cvm };
+				cv.wait(lk, [&] {
+					cout << _threadId << ": queue have " << _body.get()->Queue.size() << " items" << endl;
+					return !_body.get()->Queue.empty();
+				});
 
 				if (_terminate)
 				{
 					_terminated = true;
+					lk.unlock();
+					cv.notify_one();
 					return;
 				}
-
-				_callable(_context, _contextLock, _queue, _queueLock);
+				
+				_callable(*_body.get());
+				cout << _threadId << "iteration done, left " << _body.get()->Queue.size() << " items" << endl;
+				lk.unlock();
+				cv.notify_one();
 			}
 		}
 	public:
 		Worker() = default;
-		Worker(callable_type callable, context_type context) : _callable(callable), _context(context) {}
-		Worker(context_type context) : _context(context) {}
-		Worker(callable_type callable) : _callable(callable) {}
+		Worker(callable_type callable) :
+			_callable(callable), _body(make_shared<body_type>())
+		{}
+		template<typename ...TArgs>
+		Worker(callable_type callable, TArgs&&... args) :
+			_callable(callable), _body(make_shared<body_type>(args...))
+		{}
+		Worker(self_type&& rhs) = delete;
+		Worker(const self_type& rhs) = delete;
+		/*
+		Worker(self_type&& rhs) :
+			_thread(rhs._thread), _callable(rhs._callable), _body(rhs._body)
+		{}
+		Worker(const self_type& rhs) :
+			_thread(rhs._thread), _callable(rhs._callable), _body(rhs._body)
+		{}
+		*/
 
-		item_lock<item_queue_type> obtain_queue() { return item_lock<item_queue_type> { _queue, _queueLock }; }
-		item_lock<context_type> obtain_context() { return item_lock<context_type>{ _context, _contextLock }; }
+		body_type& body() { return *_body.get(); }
+		item_lock<body_type> obtain_body() { return item_lock<body_type>{ *_body.get(), *_body.get()->Mutex }; }
+		item_lock<body_type> try_obtain_body() { return item_lock<body_type>{ *_body.get(), __try_lock{}, *_body.get()->Mutex }; }
 
-		item_lock<item_queue_type> try_obtain_queue() { return item_lock<item_queue_type> { _queue, __try_lock{}, _queueLock }; }
-		item_lock<context_type> try_obtain_context() { return item_lock<context_type>{ _context, __try_lock{}, _contextLock }; }
-
+		auto thread_id() const { return _threadId;  }
 		void run()
 		{
-			_thread = std::thread{ _loop };
+			_thread = make_shared<std::thread>(&self_type::_loop, this);
 		}
 		void run_here()
 		{
-			_thread = std::thread{ _loop };
-			_thread.join();
+			//_thread = make_shared<std::thread>(&self_type::_loop, this);
+			//_thread->join();
+			_loop();
 		}
 
 		void terminate()
 		{
 			_terminate = true;
-			InternalSemaphore.release();
+			cv.notify_all();
 		}
 		bool is_terminated() const { return _terminated; }
 
-		void wakeup()
+		inline auto wait()
 		{
-			InternalSemaphore.release();
+			unique_lock lk { cvm };
+			cv.wait(lk, [&]
+			{
+				return _body.get()->Queue.empty();
+			});
+			return lk;
 		}
 	};
 
@@ -103,59 +149,104 @@ namespace Utilities::Threading
 	struct _worker_context : public obtainable_item<T>
 	{
 	public:
-		_shared_context_t& SharedContext;
+		using self_type = _worker_context<T, _shared_context_t>;
 
-		_worker_context(_shared_context_t& shared) : SharedContext(shared), obtainable_item<T>() {}
+		std::shared_ptr<_shared_context_t> SharedContext;
+
+		_worker_context() = default;
+		_worker_context(std::shared_ptr<_shared_context_t> shared) 
+			: SharedContext(shared), obtainable_item<T>() 
+		{}
 
 		template<typename ...TArgs>
-		_worker_context(_shared_context_t& shared, TArgs... args) : SharedContext(shared), obtainable_item<T>(...args) {}
+		_worker_context(std::shared_ptr<_shared_context_t> shared, TArgs&&... args) 
+			: SharedContext(shared), obtainable_item<T>(args...) 
+		{}
+
+		_worker_context(self_type&& rhs) :
+			SharedContext(rhs.SharedContext)//, obtainable_item<T>(rhs)
+		{}
+		_worker_context(const self_type& rhs) :
+			SharedContext(rhs.SharedContext)//, obtainable_item<T>(rhs)
+		{}
 	};
 	/*!
 	* @author multfinite
 	*/
-	template<
-		typename TWorkerContext, typename TWorkerItem, typename TSharedContext, 
-		typename TWorkerCallable, typename TMainCallable>
+	template<typename TMainCallable, typename TWorkerCallable,	typename TWorkerContext, typename TWorkerItem, typename TSharedContext>
 	class Loop
 	{
 	public:
+		using callable_type = TMainCallable;
 		using shared_context = obtainable_item<TSharedContext>;
-		using worker_context = _worker_context<TWorkerContext, TSharedContext>;
-		using worker_type = Worker<TWorkerCallable, worker_context, TWorkerItem>;
+		using worker_context = _worker_context<TWorkerContext, shared_context>;
+		using worker_body = WorkerBody<worker_context, TWorkerItem>;
+		using worker_type = Worker<TWorkerCallable, worker_body>;
+		using worker_type_ptr = std::shared_ptr<worker_type>;
+		using worker_collection = vector<worker_type_ptr>;
+		//using function_type = std::function<void(shared_context& shared, vector<worker_type>& workers)>;
 	protected:
-		vector<worker_type> _workers;
-		shared_context _shared;
-
-		/* void main(shared_context& shared, vector<worker_type>& workers); */
-		TMainCallable _main;
+		worker_collection _workers;
+		std::shared_ptr<shared_context> _shared;
+		callable_type _callable;
 	public:
-		Loop(TMainCallable main, size_t workers, TWorkerCallable worker) :
-			_main(main), _worker(worker)
+		Loop(callable_type main, size_t workers, worker_type::callable_type worker) :
+			_callable(main), 
+			_shared(make_shared<shared_context>())
 		{
 			_workers.reserve(workers);
 			for (auto i = 0; i < workers; ++i)
 			{
-				auto& worker = _workers.emplace_back(_worker, worker_context{ _shared });
-				worker.run();
+				worker_type_ptr pWrk = make_shared<worker_type>(worker, _shared);
+				_workers.push_back(pWrk);
+				worker_type& w = *pWrk.get();
+				w.run();
 			}
 		}
 		template<typename ...TArgs>
-		Loop(TMainCallable main, size_t workers, TWorkerCallable worker, TArgs... workerContextArgs) :
-			_main(main), _worker(worker)
+		Loop(callable_type main, size_t workers, worker_type::callable_type worker, TArgs&&... workerContextArgs) :
+			_callable(main), 
+			_shared(make_shared<shared_context>())
 		{
 			_workers.reserve(workers);
 			for (auto i = 0; i < workers; ++i)
 			{
-				auto& worker = _workers.emplace_back(_worker, worker_context{ _shared, ...workerContextArgs });
-				worker.run();
+				worker_type_ptr pWrk = make_shared<worker_type>(worker, _shared, workerContextArgs...);
+				_workers.push_back(pWrk);
+				worker_type& w = *pWrk.get();
+				w.run();
 			}
 		}
 
 		void run()
 		{
+			auto threadId = std::this_thread::get_id();
 			while (true)
 			{
-				_main(_shared, _workers);
+				for (auto& pw : _workers)
+					pw.get()->cvm.lock();
+
+				_callable(
+					(shared_context &) *_shared.get(), 
+					(worker_collection&) _workers
+				);
+				for (auto& pw : _workers)
+					pw.get()->cvm.unlock();
+
+				for (auto& pw : _workers)
+				{
+					auto& w = *pw.get();
+					cout << threadId << ": worker (" << w.thread_id() << ")  have " << w.body().Queue.size() << " items" << endl;
+					w.cv.notify_one();
+					cout << threadId << ": " << w.thread_id() << " notified" << endl;
+				}
+				
+				for (auto& pw : _workers)
+				{
+					auto& w = *pw.get();
+					cout << threadId << ": wait for " << w.thread_id() << endl;
+					auto lk = w.wait();
+				}
 			}
 		}
 	};
