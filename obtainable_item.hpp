@@ -9,17 +9,29 @@ namespace Utilities
 	struct obtainable_item
 	{
 	public:
+		using value_type = T;
 	private:
-		T _item;
-		std::mutex _lock;
+		std::shared_ptr<value_type> _item;
+		std::shared_ptr<std::mutex> _mutex;
 	public:
-		obtainable_item() = default;
-
+		obtainable_item() : 
+			_mutex(make_shared<std::mutex>()),
+			_item(make_shared<value_type>()) 
+		{}
 		template<typename ...TArgs>
-		obtainable_item(TArgs... args) : _item(...args) {}
+		obtainable_item(TArgs&&... args) :
+			_mutex(make_shared<std::mutex>()),
+			_item(make_shared<value_type>(args...))
+		{}
+		obtainable_item(obtainable_item<T>&& rhs) : 
+			_item(rhs._item), _mutex(rhs._mutex)
+		{}
+		obtainable_item(const obtainable_item<T>& rhs) :
+			_item(rhs._item), _mutex(rhs._mutex)
+		{}
 
-		item_lock<T> obtain() { return item_lock<T> { _item, _lock }; }
-		T& direct() { return _item; }
+		item_lock<value_type> obtain() { return item_lock<value_type> { *_item.get(), *_mutex.get() }; }
+		value_type& direct() { return *_item.get(); }
 	};
 }
 
