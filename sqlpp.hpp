@@ -162,7 +162,7 @@ namespace Utilities::SQLPP
 		{
 			string name = sqlpp::get_sql_name(field);
 			auto value = field.value();
-			j[name] = json_compatible(value);
+			j[name] = Utilities::JSON::json_compatible(value);
 		});
 	}
 

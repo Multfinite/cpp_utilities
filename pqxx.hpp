@@ -36,10 +36,12 @@ namespace pqxx
 namespace Utilities::PQXX
 {
 	using namespace pqxx;
+	using namespace Utilities::SQL;
 
 	shared_ptr<connection> connect(string address, int64_t port, string database, string username, string userpass)
 	{
-		string connstr = "host=%host% port=%port% dbname=%db% user=%dbuser% password=%dbpass%";
+		//string connstr = "host=%host% port=%port% dbname=%db% user=%dbuser% password=%dbpass%";
+		string connstr = "postgresql://%dbuser%:%dbpass%@%host%:%port%?dbname=%db%&client_encoding=WIN1251";
 		string_replace_all_templates(connstr, 
 		{
 			{ "%host%", address },
@@ -52,7 +54,7 @@ namespace Utilities::PQXX
 		return shared_ptr<connection>(new connection{ connstr });
 	}
 
-	template<typename TTransaction, typename THandler, typename ...TRowParameters>
+	template<typename TTransaction, typename THandler, typename>
 	void iterate_items(TTransaction& t, THandler handler, string what, string from, size_t perpage)
 	{
 		auto rc = t.exec1(count_rows(from));
@@ -61,7 +63,22 @@ namespace Utilities::PQXX
 		for (size_t i = 0; i*perpage < count; i++)
 		{
 			for (auto row : t.exec(select_page(what, from, i, perpage)))
-				handler(row.as<TRowParameters...>());
+				handler(row); // row.as<TRowParameters...>
+		}
+	}
+
+	template<typename TTransaction, typename THandler>
+	void iterate_items_with_condition(
+		TTransaction& t, THandler handler, 
+		string what, string from, string condition, size_t perpage)
+	{
+		auto rc = t.exec1(count_rows(from));
+		auto count = std::get<0>(rc.as<size_t>());
+
+		for (size_t i = 0; i * perpage < count; i++)
+		{
+			for (auto row : t.exec(select_page_with_condition(what, from, condition, i, perpage)))
+				handler(row); // row.as<TRowParameters...>
 		}
 	}
 #ifndef UTILITIES_SQLPP_NO_JSON
