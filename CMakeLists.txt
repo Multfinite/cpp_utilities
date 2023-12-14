@@ -26,7 +26,6 @@ endif()
 #file(GLOB_RECURSE src
 file(GLOB src
 	"*.cpp",
-	"iconvlite/*.cpp"
 )
 foreach (isrc ${src})
     message("${isrc}")
