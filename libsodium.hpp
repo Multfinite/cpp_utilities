@@ -78,7 +78,7 @@ class libsodium
 	
 		std::string sign(std::string& message, std::string& publicKey) { throw;  }
 	
-		std::string to_base64(std::string binary, int var)
+		std::string to_base64(const std::string& binary, int var)
 		{
 			std::string b64; 
 			b64.resize(sodium_base64_encoded_len(binary.size(), var));
@@ -87,7 +87,7 @@ class libsodium
 				throw "TODO: IMPLEMENT LOBSODIUM BASE64 ENCODE ERROR";
 			return b64;
 		}
-		std::string from_base64(std::string b64, int var)
+		std::string from_base64(const std::string& b64, int var)
 		{
 			size_t binMaxSize = std::ceil(3 * b64.size() / 4);
 	

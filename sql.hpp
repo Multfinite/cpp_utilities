@@ -7,7 +7,21 @@
 
 namespace Utilities::SQL
 {
-	string select_page(string what, string from, size_t page, size_t perpage)
+	std::string as_sql(const std::string& v) { return "'" + v + "'"; };
+	std::string as_sql(const char* v) { return "'" + std::string(v) + "'"; };
+	std::string as_sql(std::string_view v) { return "'" + std::string(v.data()) + "'"; };
+	std::string as_sql(uint8_t v) { return std::to_string(v); }
+	std::string as_sql(uint16_t v) { return std::to_string(v); }
+	std::string as_sql(uint32_t v) { return std::to_string(v); }
+	std::string as_sql(uint64_t v) { return std::to_string(v); }
+	std::string as_sql(int8_t v) { return std::to_string(v); }
+	std::string as_sql(int16_t v) { return std::to_string(v); }
+	std::string as_sql(int32_t v) { return std::to_string(v); }
+	std::string as_sql(int64_t v) { return std::to_string(v); }
+	std::string as_sql(double v) { return std::to_string(v); }
+	std::string as_sql(float v) { return std::to_string(v); }
+
+	string select_page(const string& what, const string& from, size_t page, size_t perpage)
 	{
 		string q = "select %what% from %from% limit %limit% offset %offset%";
 		string_replace_all_templates(q,
@@ -20,7 +34,7 @@ namespace Utilities::SQL
 		return q;
 	}
 
-	string select_page_with_condition(string what, string from, string condition, size_t page, size_t perpage)
+	string select_page_with_condition(const string& what, const string& from, const string& condition, size_t page, size_t perpage)
 	{
 		string q = "select %what% from %from% where %condition% limit %limit% offset %offset%";
 		string_replace_all_templates(q,
@@ -34,7 +48,7 @@ namespace Utilities::SQL
 		return q;
 	}
 
-	string count_rows(string from)
+	string count_rows(const string& from)
 	{
 		string q = "select count(*) as rows from %from%";
 		string_replace_all_templates(q,
@@ -45,15 +59,36 @@ namespace Utilities::SQL
 	}
 
 	template<typename ItBegin, typename ItEnd>
-	string where_in(string what, ItBegin begin, ItEnd end)
+	string where_in(const string& what, ItBegin begin, ItEnd end)
 	{
 		stringstream ss;
-		ss << what << " in (" << *begin++;
-		
-		std::for_each(begin, end, [&ss](auto item)
+		ss << what << " in (";
+		if (begin != end)
 		{
-			ss << ", " << item;
-		});
+			ss << as_sql(*begin++);
+			std::for_each(begin, end, [&ss](const auto& item)
+			{
+				ss << ", " << as_sql(item);
+			});
+		}
+		else ss << "select null";
+		ss << ")";
+		return ss.str();
+	}
+	template<typename ItBegin, typename ItEnd, typename TExtractor>
+	string where_in(const string& what, ItBegin begin, ItEnd end, const TExtractor& extractor)
+	{
+		stringstream ss;
+		ss << what << " in (";
+		if(begin != end)
+		{
+			ss << as_sql(extractor(*begin++));
+			std::for_each(begin, end, [&ss, &extractor](const auto& item)
+			{
+				ss << ", " << as_sql(extractor(item));
+			});
+		}
+		else ss << "select null";
 		ss << ")";
 		return ss.str();
 	}
@@ -128,6 +163,52 @@ namespace Utilities::SQL
 			ss << ";";
 
 			return ss.str();
+		}
+	};
+
+	template<typename TDbConn>
+	struct SqlInvoker
+	{
+		void operator()(const TDbConn& db, const std::string& sql) const;
+	};
+
+	/*
+	template<string_literal name, typename T>
+	struct Column
+	{
+		static inline string_literal Name = name;
+	};
+	template<string_literal name, typename ...TColumns>
+	struct Table
+	{
+		static inline string_literal Name = name;
+	};
+	*/
+
+	template<string_literal name, typename ...TArgs>
+	struct Procedure
+	{
+		static inline string_literal Name = name;
+
+		static std::string sql(const TArgs&... args)
+		{
+			stringstream ss;
+			ss << "call " << Name.value << "(";
+			size_t i = 0;
+			([&]
+			{
+				if(i++ > 0)
+					ss << ", ";
+				ss << as_sql(args);
+			} (), ...);
+			ss << ")";
+			return ss.str();
+		}
+
+		template<typename TDbConn>
+		void operator()(const TDbConn& db, const TArgs&... args) const
+		{
+			SqlInvoker<TDbConn>{}(db, sql(args));
 		}
 	};
 }

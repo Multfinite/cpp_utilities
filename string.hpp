@@ -21,6 +21,9 @@ namespace Utilities
         }
     
         char value[N];
+
+        operator std::string_view() const { return std::string_view{ value, N }; }
+        operator const char*() const { return &value; }
     };
     
     /* https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf */
@@ -35,20 +38,21 @@ namespace Utilities
         return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
     }
     
-    inline std::string string_tolower(std::string str)
+    inline std::string string_tolower(const std::string& str)
     {
+        std::string s = str;
         std::transform(
-            str.begin(), str.end(), str.begin(),
+            s.begin(), s.end(), s.begin(),
             [](unsigned char c) { return std::tolower(c); }
         );
-        return str;
+        return s;
     }
 
     /* https://stackoverflow.com/questions/5878775/how-to-find-and-replace-string */
     inline void string_replace_all(
         std::string& s,
-        std::string toReplace,
-        std::string replaceWith
+        const std::string& toReplace,
+        const std::string& replaceWith
     ) {
         std::string buf;
         std::size_t pos = 0;
@@ -71,19 +75,30 @@ namespace Utilities
         s.swap(buf);
     }
     
+    inline std::string string_replace_all_templates(
+        const std::string& s,
+        const std::map<std::string, std::string>& replacements
+    ) {
+        std::string str = s;
+        for (auto& kvp : replacements)
+        {
+            string_replace_all(str, kvp.first, kvp.second);
+        }
+        return str;
+    }
     inline void string_replace_all_templates(
-        std::string& s,
-        std::map<std::string, std::string> replacements
-    )
-    {
+       std::string& s,
+       const std::map<std::string, std::string>& replacements
+    ) {
         for (auto& kvp : replacements)
         {
             string_replace_all(s, kvp.first, kvp.second);
         }
     }
     
-    std::list<std::string> string_split(std::string s, std::string delimiter)
+    std::list<std::string> string_split(const std::string& str, const std::string& delimiter)
     {
+        std::string s = str;
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;
         std::list<std::string> res;
@@ -100,7 +115,7 @@ namespace Utilities
         return res;
     }
 
-    std::list<std::string> string_split_ret_s(std::string s, std::string delimiter)
+    std::list<std::string> string_split_ret_s(const std::string& s, const std::string& delimiter)
     {
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;
@@ -119,6 +134,16 @@ namespace Utilities
             res.push_back(s);
 
         return res;
+    }
+}
+
+namespace std
+{
+    inline std::string to_string(const std::thread::id& tid)
+    {
+        stringstream ss;
+        ss << tid;
+        return ss.str();
     }
 }
 

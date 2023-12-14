@@ -4,6 +4,7 @@
 #include "buffer.hpp"
 #include "envinronment.hpp"
 #include "exceptions.hpp"
+#include "algorithm.hpp"
 #include "file.hpp"
 #include "json.hpp"
 #include "string.hpp"

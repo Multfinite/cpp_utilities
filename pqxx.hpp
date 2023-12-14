@@ -5,6 +5,7 @@
 
 #include "type_definitions.hpp"
 #include "string.hpp"
+#include "sql.hpp"
 
 #ifndef UTILITIES_SQLPP_NO_JSON
 #include "json.hpp"
@@ -33,15 +34,22 @@ namespace pqxx
 	//		int64_t t;
 	//return ;
 }
+
 namespace Utilities::PQXX
 {
 	using namespace pqxx;
 	using namespace Utilities::SQL;
 
-	shared_ptr<connection> connect(string address, int64_t port, string database, string username, string userpass)
-	{
+	shared_ptr<connection> connect(
+		const string& address, 
+		int64_t port, 
+		const string& database,
+		const string& username,
+		const string& userpass,
+		const string& clientEncoding = "UTF8"
+	) {
 		//string connstr = "host=%host% port=%port% dbname=%db% user=%dbuser% password=%dbpass%";
-		string connstr = "postgresql://%dbuser%:%dbpass%@%host%:%port%?dbname=%db%&client_encoding=WIN1251";
+		string connstr = "postgresql://%dbuser%:%dbpass%@%host%:%port%?dbname=%db%&client_encoding=%encoding%";
 		string_replace_all_templates(connstr, 
 		{
 			{ "%host%", address },
@@ -49,18 +57,22 @@ namespace Utilities::PQXX
 			{ "%db%", database },
 			{ "%dbuser%", username },
 			{ "%dbpass%", userpass },
+			{ "%encoding%", clientEncoding }
 		});
 		
 		return shared_ptr<connection>(new connection{ connstr });
 	}
 
-	template<typename TTransaction, typename THandler, typename>
-	void iterate_items(TTransaction& t, THandler handler, string what, string from, size_t perpage)
-	{
+	template<typename TTransaction, typename THandler>
+	void iterate_items(
+		TTransaction& t, THandler handler, 
+		const string& what, const string& from, 
+		size_t perpage
+	) {
 		auto rc = t.exec1(count_rows(from));
 		auto count = std::get<0>(rc.as<size_t>());
 
-		for (size_t i = 0; i*perpage < count; i++)
+		for (size_t i = 0; i * perpage < count; i++)
 		{
 			for (auto row : t.exec(select_page(what, from, i, perpage)))
 				handler(row); // row.as<TRowParameters...>
@@ -70,8 +82,9 @@ namespace Utilities::PQXX
 	template<typename TTransaction, typename THandler>
 	void iterate_items_with_condition(
 		TTransaction& t, THandler handler, 
-		string what, string from, string condition, size_t perpage)
-	{
+		const string& what, const string& from, const string& condition,
+		size_t perpage
+	) {
 		auto rc = t.exec1(count_rows(from));
 		auto count = std::get<0>(rc.as<size_t>());
 

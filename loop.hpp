@@ -73,8 +73,7 @@ namespace Utilities::Threading
 			{				
 				unique_lock lk { cvm };
 				cv.wait(lk, [&] {
-					cout << _threadId << ": queue have " << _body.get()->Queue.size() << " items" << endl;
-					return !_body.get()->Queue.empty();
+					return !_body.get()->Queue.empty() || _terminate;
 				});
 
 				if (_terminate)
@@ -86,7 +85,6 @@ namespace Utilities::Threading
 				}
 				
 				_callable(*_body.get());
-				cout << _threadId << "iteration done, left " << _body.get()->Queue.size() << " items" << endl;
 				lk.unlock();
 				cv.notify_one();
 			}
@@ -139,7 +137,7 @@ namespace Utilities::Threading
 			unique_lock lk { cvm };
 			cv.wait(lk, [&]
 			{
-				return _body.get()->Queue.empty();
+				return _body.get()->Queue.empty() || _terminated;
 			});
 			return lk;
 		}
@@ -236,15 +234,12 @@ namespace Utilities::Threading
 				for (auto& pw : _workers)
 				{
 					auto& w = *pw.get();
-					cout << threadId << ": worker (" << w.thread_id() << ")  have " << w.body().Queue.size() << " items" << endl;
 					w.cv.notify_one();
-					cout << threadId << ": " << w.thread_id() << " notified" << endl;
 				}
 				
 				for (auto& pw : _workers)
 				{
 					auto& w = *pw.get();
-					cout << threadId << ": wait for " << w.thread_id() << endl;
 					auto lk = w.wait();
 				}
 			}

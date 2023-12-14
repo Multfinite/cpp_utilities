@@ -156,7 +156,7 @@ namespace Utilities::SQLPP
 	using nlohmann::json;
 
 	template<typename result_field>
-	void to_json(result_field& item, json& j)
+	void field_to_json(result_field& item, json& j)
 	{
 		sqlpp::for_each_field(item, [&j](const auto& field)
 		{
@@ -256,7 +256,7 @@ namespace Utilities::SQLPP
 		for (auto& item : rows) \
 		{ \
 			json& j = items.emplace_back(); \
-			to_json(item, j); \
+			field_to_json(item, j); \
 		} \
 	} \
 	else \
@@ -266,7 +266,7 @@ namespace Utilities::SQLPP
 		for (auto& item : rows) \
 		{ \
 			json& j = items.emplace_back(); \
-			to_json(item, j); \
+			field_to_json(item, j); \
 		} \
 	} \
 } \
@@ -292,7 +292,7 @@ namespace Utilities::SQLPP
 			for (auto& item : rows)
 			{
 				json& j = items.emplace_back();
-				to_json(item, j);
+				field_to_json(item, j);
 			}
 			return rows.size();
 		}
@@ -304,7 +304,7 @@ namespace Utilities::SQLPP
 			for (auto& item : rows)
 			{
 				json& j = items.emplace_back();
-				to_json(item, j);
+				field_to_json(item, j);
 			}
 			return rows.size();
 		}
