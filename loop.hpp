@@ -4,7 +4,6 @@
 #include "type_definitions.hpp"
 #include "item_lock.hpp"
 #include "obtainable_item.hpp"
-#include "buffered_collection.hpp"
 
 #include <queue>
 #include <chrono>
@@ -25,7 +24,6 @@ namespace Utilities::Threading
 
 	using Utilities::item_lock;
 	using Utilities::obtainable_item;
-	using Utilities::buffered_list;
 
 	template<typename TContext, typename TItem>
 	struct WorkerBody
