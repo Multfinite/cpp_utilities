@@ -137,6 +137,9 @@ namespace Utilities
     }
 }
 
+#include <thread>
+#include <sstream>
+
 namespace std
 {
     inline std::string to_string(const std::thread::id& tid)
