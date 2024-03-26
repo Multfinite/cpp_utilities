@@ -60,7 +60,7 @@ namespace Exceptions
 	{
 		std::string const FileName;
 
-		file_not_found_error(const std::string& function, const std::string& file, int line, std::string_view const& filename) : base_error("Function (" + std::string(filename) + ") not found", function, file, line), FileName(filename) {}
+		file_not_found_error(const std::string& function, const std::string& file, int line, std::string_view const& filename) : base_error("File (" + std::string(filename) + ") not found", function, file, line), FileName(filename) {}
 		file_not_found_error(const std::string& msg, const std::string& function, std::string file, int line, std::string_view const& filename) : base_error(msg, function, file, line), FileName(filename) { }
 	};
 	struct item_not_found_exception : public base_error
