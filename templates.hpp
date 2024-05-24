@@ -1,6 +1,16 @@
 #ifndef UTILITIES_TEMPLATES_HPP
 #define UTILITIES_TEMPLATES_HPP
 
+#if __cplusplus >= 202002L
+#include <concepts>
+
+#define HasField(C, F)                               \
+    []() {                                           \
+        auto check = [](auto u) -> decltype(u.F) {}; \
+        return std::invocable<decltype(check), C>;   \
+    }();
+#endif
+
 namespace Utilities
 {
     /* https://stackoverflow.com/questions/16853552/how-to-create-a-type-list-for-variadic-templates-that-contains-n-times-the-sam */
