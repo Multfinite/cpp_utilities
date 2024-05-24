@@ -269,7 +269,7 @@ namespace Utilities
 
                 for(auto& adjacent : unexplored)
                 {
-                    if(adjacent.Context.Pathdinfind.State != PathfindingState::Explored)
+                    if(adjacent.Context.Pathdinfind.State == PathfindingState::Unhandled)
                     {
                         _spec.Put(reachable, adjacent);
                         adjacent.Context.Pathfinding.State = PathfindingState::Queued;
