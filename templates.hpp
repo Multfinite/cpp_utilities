@@ -4,6 +4,9 @@
 #if __cplusplus >= 202002L
 #include <concepts>
 
+template <typename T>
+concept IsNumericType = std::integral<T> || std::floating_point<T>;
+
 #define HasField(C, F)                               \
     []() {                                           \
         auto check = [](auto u) -> decltype(u.F) {}; \
