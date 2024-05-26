@@ -1,4 +1,5 @@
 #include "graph.hpp"
+#include "pathfinding.hpp"
 
 using namespace Utilities;
 
