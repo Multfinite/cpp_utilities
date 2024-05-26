@@ -11,4 +11,19 @@ inline T* offset_ptr(void* ptr, size_t offset = 0)
 	return reinterpret_cast<T*>(pointer);
 }
 
+#if __cplusplus >= 202002L
+template<typename T>
+concept Clearable = requires(T x) { x.clear(); };
+#endif
+
+template<typename ...T>
+#if __cplusplus >= 202002L
+	requires Clearable<T>
+#endif
+inline void clear(const T& ...args)
+{
+	for (auto& x : args)
+		x.clear();
+}
+
 #endif //UTILITIES_MACRO_HPP
