@@ -12,6 +12,10 @@ concept IsNumericType = std::integral<T> || std::floating_point<T>;
         auto check = [](auto u) -> decltype(u.F) {}; \
         return std::invocable<decltype(check), C>;   \
     }();
+
+#define HAS_CONCEPTS true
+#else
+#define HAS_CONCEPTS false
 #endif
 
 namespace Utilities
