@@ -49,7 +49,7 @@ namespace Utilities
         template<typename T>
         T* as_ptr(size_t index) const { return (T*)Items[index]; }
     };
-
+#if HAS_CONCEPTS
     template<typename T>
     concept HasLinkingNode =
         std::is_same<__linking_node, decltype(T::__linking)>::value&&
@@ -58,5 +58,5 @@ namespace Utilities
         x.__linking;
     };
 }
-
+#endif
 #endif // UTILITIES_LINKING_NODE_HPP
