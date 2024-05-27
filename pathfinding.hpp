@@ -18,19 +18,24 @@ namespace Utilities::Pathfinding
 #if HAS_CONCEPTS
         requires IsVertex<TVertex>&& IsNumericType<TCostType>
 #endif
-    struct VertexNode
+    struct VertexNode : public __linked_node<TVertex>
     {
         using vertex_type = TVertex;
         using cost_type = TCostType;
 
         vertex_type* Previous;
         VertexState State;
-        std::optional<cost_type> AtomicCost, Cost;
+        /*!
+         * @brief Total cost from root to this
+         */
+        std::optional<cost_type> Cost;
 
-        VertexNode() { clear(); }
+        VertexNode(const vertex_type& owner) : __linked_node(owner) { clear(); }
+        VertexNode(const vertex_type& owner, size_t index) : __linked_node(owner, index) { clear(); }
+        ~VertexNode() = default;
 
         template<typename TPathType = std::vector<std::reference_wrapper<vertex_type>>>
-        TPathType Build()
+        TPathType Build() const
         {
             TPathType path;
             auto* v = &this;
@@ -42,12 +47,94 @@ namespace Utilities::Pathfinding
             return path;
         }
 
+        vertex_type& Root() const
+        {
+            auto* v = &this;
+            while (v != nullptr)
+            {
+                path.pop_back(*v);
+                v = v->Pathfinding->Previous;
+            }
+            return *v;
+        }
+
         void clear()
         {
             Previous = nullptr;
             State = VertexState::Unhandled;
             Cost = std::nullopt;
-            AtomicCost = std::nullopt;
+        }
+    };
+
+    template<typename TEdge, typename TCostType = double>
+#if HAS_CONCEPTS
+        requires IsVertex<TVertex> && IsEdge<TEdge> && IsNumericType<TCostType>
+#endif
+    struct EdgeNode : public __linked_node<TEdge>
+    {
+        using edge_type = TEdge;
+        using vertex_type = typename edge_type::vertex_type;
+        using cost_type = TCostType;
+
+        /*!
+         * @brief Atomic transferring cost of this edge
+         */
+        std::optional<cost_type> Cost;
+
+        EdgeNode(const edge_type& owner) : __linked_node(owner) { clear(); }
+        EdgeNode(const edge_type& owner, size_t index) : __linked_node(owner, index) { clear(); }
+        ~EdgeNode() = default;
+
+        void clear()
+        {
+            Cost = std::nullopt;
+        }
+    }
+
+    template<typename TGraph, typename TCostType = double>
+#if HAS_CONCEPTS
+        requires IsGraph<TGraph> && IsNumericType<TCostType>
+#endif
+    struct GraphNode : public __linked_node<TGraph>
+    {
+        using cost_type = TCostType;
+        using graph_type = TGraph;
+        using vertex_type = typename graph_type::vertex_type;
+        using edge_type = typename graph_type::edge_type;
+        using vertex_node_type = VertexNode<vertex_type>;
+        using edge_node_type = EdgeNode<edge_type>;
+
+        std::vector<vertex_node_type> Vertexes;
+        std::vector<edge_node_type> Edges;
+
+        GraphNode(const graph_type& owner) : __linked_node(owner) { init(); }
+        GraphNode(const graph_type& owner, size_t index) : __linked_node(owner, index) { init(); }
+        ~GraphNode() = default;
+
+        void init()
+        {
+            Vertexes.reserve(Graph.Vertexes.size());
+            for (auto& v : Graph.Vertexes)
+                Vertexes.emplace_back(v, Index);
+
+            Edges.reserve(Graph.Edges.size());
+            for (auto& e : Graph.Edges)
+                Edges.emplace_back(e, Index);
+        }
+
+        void clear()
+        {
+            Edges.clear();
+            Vertexes.clear();
+        }
+
+        inline vertex_node_type& node_of(const vertex_type& v) const
+        {
+            return v.__linking.as_ref<vertex_node_type>(Index);
+        }
+        inline edge_node_type& node_of(const edge_type& v) const
+        {
+            return v.__linking.as_ref<vertex_node_type>(Index);
         }
     };
 #if HAS_CONCEPTS
@@ -57,9 +144,7 @@ namespace Utilities::Pathfinding
         x._linked_index;
         std::is_same<decltype(x._linked_index), size_t>::value;
         x.Graph;
-        x.NodeVertexes;
-        x.NodeEdges;
-        x.NodeGraph;
+        x.GraphNode;
     };
 
     template<typename T, typename TVertex, typename TCostType>
@@ -71,16 +156,17 @@ namespace Utilities::Pathfinding
     };
 #endif
 
-    template<typename TVertex, typename TCostType = double>
+    template<typename TGraphNode, typename TEdgeNode = typename TGraphNode::edge_type, typename TCostType = typename TGraphNode::cost_type>
 #if HAS_CONCEPTS
         requires IsVertex<TVertex>&& IsNumericType<TCostType>
 #endif
-    TCostType EvaluateCostDefault(const TVertex& v, const VertexNode<TVertex, TCostType>& n) { return 1; }
+    TCostType EvaluateCostDefault(const TGraphNode& g, const TEdgeNode& e) { return 1; }
 
     template<
         typename TGraph,
         typename TPathType,
-        typename TCostEvaluator
+        typename TCostEvaluator,
+        typename TCostType = double
     >
 #if HAS_CONCEPTS
     requires
@@ -88,9 +174,8 @@ namespace Utilities::Pathfinding
 #endif
     class BFS
     {
-    private:
-        size_t _linked_index = 0;
     public:
+        using cost_type = TCostType;
         using graph_type = typename TGraph;
         using vertex_type = typename graph_type::vertex_type;
         using vertex_ptr = vertex_type*;
@@ -98,80 +183,50 @@ namespace Utilities::Pathfinding
         using edge_ptr = edge_type*;
         using path_type = TPathType;
         using vertexes_type = std::list<std::reference_wrapper<vertex_type>>;
-        using vertex_node_type = VertexNode<vertex_type>;
-        using edge_node_type = int;
-        using graph_node_type = int;
+        using graph_node_type = GraphNode<TGraph, cost_type>;
+        using vertex_node_type = typename graph_node_type::vertex_node_type;
+        using edge_node_type = typename graph_node_type::edge_node_type;
 
         const graph_type& Graph;
-
-        std::vector<vertex_node_type> NodeVertexes;
-        std::vector<edge_node_type> NodeEdges;
-        graph_node_type NodeGraph;
+        graph_node_type GraphNode;
 
         TCostEvaluator Evaluator;
 
-        inline vertex_node_type& node_of(vertex_type& v)
-        {
-            return v.__linking.as_ref<vertex_node_type>(_linked_index);
-        }
-
         BFS(const graph_type& graph, const TCostEvaluator& evaluator)
-            : Graph(graph), Evaluator(evaluator)
-        {
-            _linked_index = Graph.__linking.free_index();
-            Graph.__linking.set(_linked_index, &NodeGraph);
-
-            NodeVertexes.reserve(Graph.Vertexes.size());
-            for (auto& v : Graph.Vertexes)
-            {
-                vertex_node_type& n = NodeVertexes.emplace_back(v);
-                v.__linking.set(_linked_index, &n);
-            }
-
-            NodeEdges.reserve(Graph.Edges.size());
-            for (auto& e : Graph.Edges)
-            {
-                edge_node_type& n = NodeEdges.emplace_back(e);
-                e.__linking.set(_linked_index, &n);
-            }
-        }
+            : Graph(graph), GraphNode(graph), Evaluator(evaluator)
+        {}
         BFS(const graph_type& graph) : BFS(graph, default(TCostEvaluator)) {}
-        ~BFS()
-        {
-            Graph.__linking.reset(_linked_index);
-            for (auto& v : Graph.Vertexes)
-                v.__linking.reset(_linked_index);
-            for (auto& e : Graph.Edges)
-                e.__linking.reset(_linked_index);
-        }
+        ~BFS() = default;
 
         path_type operator()(const vertex_type& from, const vertex_type& to)
         {
-            for (auto& n : NodeVertexes)
+            for (auto& e : GraphNode.Edges)
             {
-                n.clear();
-                n.AtomicCost = Evaluator(adjacent, nodeAdjacent);
+                e.clear();
+                e.Cost = Evaluator(GraphNode, e);
             }
 
-            node_of(from).State = VertexState::Explored;
-            node_of(from).Cost = 0;
+            GraphNode.node_of(from).State = VertexState::Explored;
+            GraphNode.node_of(from).Cost = 0;
 
             vertexes_type reachable;
             reachable.push_back(from);
             while (!reachable.empty())
             {
                 vertex_type& current = reachable.front(); reachable.pop_front();
-                vertex_node_type& nodeCurrent = node_of(current);
+                vertex_node_type& nodeCurrent = GraphNode.node_of(current);
                 if (current == to)
                     return nodeCurrent.Build();
 
                 reachable.remove(current);
                 nodeCurrent.State = VertexState::Explored;
 
-                for (auto& pAdjacent : current.OutcomingNeighbors)
+                for (auto& pEdge : current.OutcomingEdges)
                 {
-                    auto& adjacent = reference_cast<vertex_type>(pAdjacent);
-                    auto& nodeAdjacent = node_of(adjacent);
+                    auto& edge = reference_cast<edge_type>(pEdge);
+                    auto& nodeEdge = GraphNode.node_of(edge);
+                    auto& adjacent = edge.To;
+                    auto& nodeAdjacent = GraphNode.node_of(adjacent);
 
                     if (nodeAdjacent.State == VertexState::Unhandled)
                     {
@@ -179,11 +234,11 @@ namespace Utilities::Pathfinding
                         reachable.push_back(adjacent);
                     }
                     constexpr bool isCostPresent = nodeAdjacent.Cost.has_value();
-                    constexpr bool isShorter = nodeCurrent.Cost + nodeAdjacent.AtomicCost < nodeAdjacent.Cost;
+                    constexpr bool isShorter = nodeCurrent.Cost + nodeEdge.Cost < nodeAdjacent.Cost;
                     if (!isCostPresent || isShorter)
                     {
                         nodeAdjacent.Previous = current;
-                        nodeAdjacent.Cost = nodeCurrent.Cost + nodeAdjacent.AtomicCost;
+                        nodeAdjacent.Cost = nodeCurrent.Cost + nodeEdge.Cost;
                     }
                 }
             }
