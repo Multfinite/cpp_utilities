@@ -15,7 +15,9 @@ namespace Utilities::Pathfinding
     };
 
     template<typename TVertex, typename TCostType = double>
+#if HAS_CONCEPTS
         requires IsVertex<TVertex>&& IsNumericType<TCostType>
+#endif
     struct VertexNode
     {
         using vertex_type = TVertex;
@@ -48,7 +50,7 @@ namespace Utilities::Pathfinding
             AtomicCost = std::nullopt;
         }
     };
-
+#if HAS_CONCEPTS
     template<typename T>
     concept IsPathfinding = requires(T x)
     {
@@ -67,17 +69,23 @@ namespace Utilities::Pathfinding
     {
         c = x(v);
     };
+#endif
 
     template<typename TVertex, typename TCostType = double>
+#if HAS_CONCEPTS
         requires IsVertex<TVertex>&& IsNumericType<TCostType>
+#endif
     TCostType EvaluateCostDefault(const TVertex& v, const VertexNode<TVertex, TCostType>& n) { return 1; }
 
     template<
         typename TGraph,
         typename TPathType,
         typename TCostEvaluator
-    > requires
+    >
+#if HAS_CONCEPTS
+    requires
         IsCachingGraph<TGraph>
+#endif
     class BFS
     {
     private:
