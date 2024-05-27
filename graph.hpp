@@ -163,7 +163,7 @@ namespace Utilities
         vertex_type& const From;
         vertex_type& const To;
 
-        Edge(const vertex_type& from, const vertex_type& to, const data_type& context) :
+        EdgeBidirectional(const vertex_type& from, const vertex_type& to, const data_type& context) :
             From(from), To(to), Context(context)
         {
             From.Neighbors.push_back(&to);  From.IncomingNeighbors.push_back(&to); From.OutcomingNeighbors.push_back(&to);
@@ -172,8 +172,8 @@ namespace Utilities
             To.Neighbors.push_back(&from); To.IncomingNeighbors.push_back(&from); To.OutcomingNeighbors.push_back(&from);
             To.Edges.push_back(this); To.IncomingEdges.push_back(this); To.OutcomingEdges.push_back(this);
         }
-        Edge(const vertex_type& from, const vertex_type& to) : Edge(from, to, default(vertex_type)) {}
-        ~Edge()
+        EdgeBidirectional(const vertex_type& from, const vertex_type& to) : Edge(from, to, default(vertex_type)) {}
+        ~EdgeBidirectional()
         {
             From.Neighbors.remove(&to);  From.IncomingNeighbors.remove(&to); From.OutcomingNeighbors.remove(&to);
             From.Edges.remove(this); From.IncomingEdges.remove(this); From.OutcomingEdges.remove(this);
