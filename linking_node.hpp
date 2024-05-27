@@ -3,6 +3,8 @@
 
 #include "templates.hpp"
 
+#include <vector>
+
 namespace Utilities
 {
     struct __linking_node
@@ -57,6 +59,6 @@ namespace Utilities
     {
         x.__linking;
     };
-}
 #endif
+}
 #endif // UTILITIES_LINKING_NODE_HPP
