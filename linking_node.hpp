@@ -60,5 +60,37 @@ namespace Utilities
         x.__linking;
     };
 #endif
+
+    template<typename T>
+#if HAS_CONCEPTS
+        requires HasLinkingNode<T>
+#endif
+    struct __linked_node
+    {
+        using value_type = T;
+
+        /*!
+         * @brief This node attached to this object
+         */
+        value_type& const Owner;
+        /*!
+         * @brief Index in linking node
+         */
+        size_t const Index;
+
+        __linked_node(const value_type& owner, size_t index) : Owner(owner), Index(index) { link(); }
+        __linked_node(const value_type& owner) : __linked_node(owner, owner.__linking.next_index()) { link(); }
+        ~__linked_node() { unlink(); }
+
+    private:
+        void link()
+        {
+            Owner.__linking.set(Index, &this);
+        }
+        void unlink()
+        {
+            Owner.__linking.reset(Index);
+        }
+    };
 }
 #endif // UTILITIES_LINKING_NODE_HPP
