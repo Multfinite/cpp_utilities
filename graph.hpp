@@ -13,6 +13,7 @@
 
 namespace Utilities
 {
+#if HAS_CONCEPTS
     template<typename T>
     concept IsVertex =
         HasLinkingNode<T> &&
@@ -27,7 +28,7 @@ namespace Utilities
     };
 
     template<typename T>
-    concept IsEdgeCachedVertex = 
+    concept IsEdgeCachedVertex =
         std::ranges::range<typename T::edges_type> &&
         std::ranges::range<typename T::vertexes_type> &&
        IsVertex<T> && requires(T x)
@@ -39,7 +40,7 @@ namespace Utilities
     };
 
     template<typename T>
-    concept IsEdge = IsVertex<typename T::vertex_type> && 
+    concept IsEdge = IsVertex<typename T::vertex_type> &&
         HasLinkingNode<T> &&
         //std::is_same<decltype(T::__linked), typename T::linked_type>::value &&
         requires(T x, const typename T::vertex_type& v_, const typename T::data_type& d_)
@@ -59,7 +60,7 @@ namespace Utilities
     concept IsCachingEdge = IsEdgeCachedVertex<typename T::vertex_type> && IsEdge<T>;
 
     template<typename T>
-    concept IsGraph = 
+    concept IsGraph =
         HasLinkingNode<T> &&
         IsVertex<typename T::vertex_type> &&
         IsEdge<typename T::edge_type> &&
@@ -76,6 +77,7 @@ namespace Utilities
         IsEdgeCachedVertex<typename T::vertex_type> &&
         IsCachingEdge<typename T::edge_type> &&
         IsGraph<T>;
+#endif
 
     template<typename TData>
     struct Vertex
@@ -109,7 +111,9 @@ namespace Utilities
      * @brief one-directional edge
      */
     template<typename TVertex, typename TData>
+#if HAS_CONCEPTS
         requires IsEdgeCachedVertex<TVertex>
+#endif
     struct Edge
     {
         using data_type = TData;
@@ -145,7 +149,9 @@ namespace Utilities
      * @brief Bidirectional edge
      */
     template<typename TVertex, typename TData>
+#if HAS_CONCEPTS
         requires IsEdgeCachedVertex<TVertex>
+#endif
     struct EdgeBidirectional
     {
         using data_type = TData;
@@ -178,7 +184,9 @@ namespace Utilities
     };
 
     template<typename TVertex, typename TEdge, typename TData>
+#if HAS_CONCEPTS
         requires IsEdgeCachedVertex<TVertex> && IsCachingEdge<TEdge>
+#endif
     class Graph
     {
     public:
