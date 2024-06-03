@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <list>
+#include <iterator>
 
 #include "macro.hpp"
 
@@ -26,7 +27,7 @@ namespace Utilities {
         using iterator = typename list_type::iterator;
         using const_iterator = typename list_type::const_iterator;
         using reverse_iterator = typename list_type::reverse_iterator;
-        using reverse_const_iterator = typename list_type::reverse_const_iterator;
+        using const_reverse_iterator = typename list_type::const_reverse_iterator;
     private:
         list_type _l;
         std::mutex _m;
@@ -176,8 +177,8 @@ namespace Utilities {
     iterator rbegin() { return _l.rbegin();  }
     const_iterator rbegin() const { return _l.rbegin(); }
 
-    iterator rend() { return _l.rend();  }
-    const_iterator rend() const { return _l.rend(); }
+    reverse_iterator rend() { return _l.rend();  }
+    const_reverse_iterator rend() const { return _l.rend(); }
 
     size_type size() const { auto lk = std::unique_lock<std::mutex>(_m);
         return _l.size(); }
@@ -204,14 +205,14 @@ namespace Utilities {
     iterator rbegin() noexcept { return _l.rbegin();  }
     const_iterator rbegin() const noexcept { return _l.rbegin(); }
 
-    iterator rend() noexcept { return _l.rend();  }
-    const_iterator rend() const noexcept { return _l.rend(); }
+    reverse_iterator rend() noexcept { return _l.rend();  }
+    const_reverse_iterator rend() const noexcept { return _l.rend(); }
 
     const_iterator cbegin() const noexcept { return _l.cbegin(); };
     const_iterator cend() const noexcept { return _l.cend(); };
 
-    const_iterator crbegin() const noexcept { return _l.crbegin(); };
-    const_iterator crend() const noexcept { return _l.crend(); };
+    const_reverse_iterator crbegin() const noexcept { return _l.crbegin(); };
+    const_reverse_iterator crend() const noexcept { return _l.crend(); };
 
     size_type size() const noexcept { auto lk = std::unique_lock<std::mutex>(_m);
         return _l.size(); }
