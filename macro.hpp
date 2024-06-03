@@ -37,7 +37,7 @@ template<typename ...T>
 #endif
 inline void clear(const T& ...args)
 {
-	for (auto& x : args)
+	for (auto& x : {args...})
 		x.clear();
 }
 
