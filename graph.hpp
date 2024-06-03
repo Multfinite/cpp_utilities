@@ -96,7 +96,7 @@ namespace Utilities
         vertexes_type Neighbors, IncomingNeighbors, OutcomingNeighbors;
 
         Vertex(const data_type& context) : Context(context) {}
-        Vertex() : Vertex(default(data_type)) {}
+        Vertex() : Vertex(data_type{}) {}
 
         void clear()
         {
@@ -122,8 +122,8 @@ namespace Utilities
         __linking_node __linking;
 
         data_type Context;
-        vertex_type& const From;
-        vertex_type& const To;
+        vertex_type& From;
+        vertex_type& To;
 
         Edge(const vertex_type& from, const vertex_type& to, const data_type& context) :
             From(from), To(to), Context(context)
@@ -134,9 +134,11 @@ namespace Utilities
             To.Neighbors.push_back(&from); To.IncomingNeighbors.push_back(&from);
             To.Edges.push_back(this); To.IncomingEdges.push_back(this);
         }
-        Edge(const vertex_type& from, const vertex_type& to) : Edge(from, to, default(vertex_type)) {}
+        Edge(const vertex_type& from, const vertex_type& to) : Edge(from, to, data_type{}) {}
         ~Edge()
         {
+             auto to = To; auto from = From;
+
             From.Neighbors.remove(&to);  From.OutcomingNeighbors.remove(&to);
             From.Edges.remove(this); From.OutcomingEdges.remove(this);
 
@@ -160,8 +162,8 @@ namespace Utilities
         __linking_node __linking;
 
         data_type Context;
-        vertex_type& const From;
-        vertex_type& const To;
+        vertex_type& From;
+        vertex_type& To;
 
         EdgeBidirectional(const vertex_type& from, const vertex_type& to, const data_type& context) :
             From(from), To(to), Context(context)
@@ -172,9 +174,11 @@ namespace Utilities
             To.Neighbors.push_back(&from); To.IncomingNeighbors.push_back(&from); To.OutcomingNeighbors.push_back(&from);
             To.Edges.push_back(this); To.IncomingEdges.push_back(this); To.OutcomingEdges.push_back(this);
         }
-        EdgeBidirectional(const vertex_type& from, const vertex_type& to) : Edge(from, to, default(vertex_type)) {}
+        EdgeBidirectional(const vertex_type& from, const vertex_type& to) : EdgeBidirectional(from, to, data_type{}) {}
         ~EdgeBidirectional()
         {
+            auto to = To; auto from = From;
+
             From.Neighbors.remove(&to);  From.IncomingNeighbors.remove(&to); From.OutcomingNeighbors.remove(&to);
             From.Edges.remove(this); From.IncomingEdges.remove(this); From.OutcomingEdges.remove(this);
 
@@ -215,7 +219,7 @@ namespace Utilities
         }
         edge_type& Between(const vertex_type& from, const vertex_type& to)
         {
-            return Between(from, to, default(edge_data_type));
+            return Between(from, to, edge_data_type{});
         }
         edge_type& Between(const vertex_type& from, const vertex_type& to, const edge_data_type& context)
         {
@@ -238,7 +242,7 @@ namespace Utilities
 
         void clear()
         {
-            __linked.clear();
+            __linking.clear();
             Edges.clear();
             Vertexes.clear();
         }
