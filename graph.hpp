@@ -86,8 +86,8 @@ namespace Utilities
         using vertex_type = Vertex<data_type>;
         using edge_ptr = void*;
         using vertex_ptr = vertex_type*;
-        using edges_type = std::vector<edge_ptr>;
-        using vertexes_type = std::vector<vertex_ptr>;
+        using edges_type = std::list<edge_ptr>;
+        using vertexes_type = std::list<vertex_ptr>;
 
         __linking_node __linking;
 
