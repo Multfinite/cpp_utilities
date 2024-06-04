@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 
 #include <nlohmann/json.hpp>
 
@@ -44,7 +45,7 @@ namespace Utilities::JSON
 	}
 	
 	inline void validate_json_object(
-		std::string function, std::string file, int line,
+		const std::string& function, const std::string& file, int line,
 		nlohmann::json const& item, 
 		std::optional<std::map<std::string, nlohmann::json::value_t>> requiredKeys)
 	{
@@ -89,7 +90,7 @@ namespace Utilities::JSON
 	}  
 
 	template<typename T>
-	inline void _from_json(const std::string p, const json& j, std::optional<T>& v)
+	inline void _from_json(const std::string& p, const nlohmann::json& j, std::optional<T>& v)
 	{
 		try
 		{	
@@ -109,7 +110,7 @@ namespace Utilities::JSON
 	}
 
 	template<typename T>
-	inline void _to_json(const std::string p, json& j, const std::optional<T>& v)
+	inline void _to_json(const std::string& p, nlohmann::json& j, const std::optional<T>& v)
 	{
 		if (v.has_value())
 			j[p] = v.value();
