@@ -72,14 +72,14 @@ namespace Utilities
         /*!
          * @brief This node attached to this object
          */
-        value_type& const Owner;
+        value_type& Owner;
         /*!
          * @brief Index in linking node
          */
-        size_t const Index;
+        size_t Index;
 
-        __linked_node(const value_type& owner, size_t index) : Owner(owner), Index(index) { link(); }
-        __linked_node(const value_type& owner) : __linked_node(owner, owner.__linking.next_index()) { link(); }
+        __linked_node(value_type& owner, size_t index) : Owner(owner), Index(index) { link(); }
+        __linked_node(value_type& owner) : __linked_node(owner, owner.__linking.next_index()) { link(); }
         ~__linked_node() { unlink(); }
 
     private:
