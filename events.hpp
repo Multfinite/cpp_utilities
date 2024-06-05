@@ -1,4 +1,4 @@
-﻿#ifndef UTILITIES_EVENTS_HPP
+#ifndef UTILITIES_EVENTS_HPP
 #define UTILITIES_EVENTS_HPP
 
 #include <list>
@@ -20,7 +20,7 @@ namespace Utilities
 		void operator()(TArgs... args) const
 		{
 			for (auto& callback : _callbacks)
-				callback(args);
+				callback(args...);
 		}
 		void operator+=(CallbackType callback) { _callbacks.push_back(callback); }
 		void operator-=(CallbackType callback) { _callbacks.remove(callback); }
