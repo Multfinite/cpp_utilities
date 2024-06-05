@@ -1,10 +1,12 @@
 # https://github.com/Multfinite/cpp_utilities
 cmake_minimum_required (VERSION 3.8)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "/utf-8")
-set(CMAKE_C_FLAGS "/utf-8")
 
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+project("utilities")
 message("project: utilities")
 message("CXX `${CMAKE_CXX_STANDARD}`")
 message("CXX_FLAGS `${CMAKE_CXX_FLAGS}`")
@@ -17,17 +19,36 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	add_link_options(/FORCE:MULTIPLE)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	add_compile_options(-g)						# debug info, system specific
-	add_compile_options(-Og)						# optimization: debug
-	add_compile_options(-std=c++20)			# C++ standard
-	add_compile_options(-fpermissive)			# required for some pieces of code
+#	add_compile_options(-Og)						# optimization: debug
+        add_compile_options(-std=c++20)                             # C++ standard
+        add_compile_options(-fpermissive)                             # required for some pieces of code
 	add_compile_options(-Wchanges-meaning)
 else()
 endif()
 
+# test that filesystem header actually is there and works
+try_compile(HAS_FS "${CMAKE_BINARY_DIR}/temp"
+"${PROJECT_SOURCE_DIR}/tests/has_filesystem.cpp"
+            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
+            LINK_LIBRARIES stdc++fs)
+try_compile(HAS_FS_EXPERIMENTAL "${CMAKE_BINARY_DIR}/temp"
+"${PROJECT_SOURCE_DIR}/tests/has_experimental_filesystem.cpp"
+            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
+            LINK_LIBRARIES stdc++fs)
+
+if(HAS_FS)
+    message(STATUS "Compiler has filesystem support")
+    add_compile_definitions(STD_FS=1)
+elseif(HAS_FS_EXPERIMENTAL)
+    message(STATUS "Compiler has EXPERIMENTAL filesystem support")
+     add_compile_definitions(STD_FS=2)
+else()
+    message(FATAL_ERROR "Compiler is missing filesystem capabilities")
+    add_compile_definitions(STD_FS=0)
+endif(HAS_FS)
+
 #file(GLOB_RECURSE src
-file(GLOB src
-	"*.cpp",
-)
+file(GLOB src "*.cpp")
 foreach (isrc ${src})
     message("${isrc}")
 endforeach()
@@ -37,14 +58,29 @@ add_subdirectory("tiny-process-library")
 
 target_link_libraries (utilities_lib LINK_PUBLIC -Wl,--allow-multiple-definition tiny-process-library -Wl,--allow-multiple-definition)
 
-find_package(nlohmann_json CONFIG REQUIRED)
-target_link_libraries(utilities_lib PRIVATE nlohmann_json::nlohmann_json)
+find_package(nlohmann_json CONFIG)
+if(TARGET nlohmann_json OR nlohmann_json_FOUND)
+    target_link_libraries(utilities_lib PUBLIC nlohmann_json::nlohmann_json)
+    add_compile_definitions(ENABLE_NLOHMANN_JSON=1)
+else()
+    message("nlohmann_json not found, disable related features.")
+endif()
 
-find_package(stduuid CONFIG REQUIRED)
-target_link_libraries(utilities_lib PRIVATE stduuid)
+find_package(stduuid CONFIG)
+if(TARGET stduuid OR stduuid_FOUND)
+    target_link_libraries(utilities_lib PUBLIC stduuid)
+    add_compile_definitions(ENABLE_STDUUID=1)
+else()
+    message("stduuid not found, disable related features.")
+endif()
 
-find_package(spdlog CONFIG REQUIRED)
-target_link_libraries(utilities_lib PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+find_package(spdlog CONFIG)
+if(TARGET stduuid OR stduuid_FOUND)
+    target_link_libraries(utilities_lib PUBLIC spdlog::spdlog spdlog::spdlog_header_only)
+    add_compile_definitions(ENABLE_SPDLOG=1)
+else()
+    message("spdlog not found, disable related features.")
+endif()
 
 #find_package(utf8cpp CONFIG REQUIRED)
 #target_link_libraries(utilities_lib PRIVATE utf8cpp)
