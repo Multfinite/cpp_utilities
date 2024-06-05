@@ -8,6 +8,18 @@
 #include <map>
 #include <algorithm>
 
+#if STD_FS == 1
+    #include <string_view>
+
+    using string_view = std::string_view;
+#elif STD_FS == 2
+    #include <experimental/string_view>
+
+    using string_view = std::experimental::string_view;
+#else
+    static_assert (false, "<string_view> not supported");
+#endif
+
 namespace Utilities
 {    
     #define nameof(x) #x
