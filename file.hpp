@@ -4,17 +4,25 @@
 #include <string>
 #include <list>
 #include <memory>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <functional>
 
 #include "exceptions.hpp"
 
+
+#if STD_FS == 1
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif STD_FS == 2
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert (false, "<filesystem> not supported");
+#endif
+
 namespace Utilities
-{    
-	namespace fs = std::filesystem;
-	
+{    	
 	using filename_predicate = std::function<bool(fs::directory_entry const& entry)>;
 
 	inline size_t file_size(std::istream& s)
