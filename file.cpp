@@ -1,3 +1,4 @@
+#if STD_FS == 1
 #include "file.hpp"
 
 namespace Utilities
@@ -25,3 +26,4 @@ namespace Utilities
         }
     }
 }
+#endif
