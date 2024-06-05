@@ -22,9 +22,18 @@
 
 #include <chrono>
 
+#if ENABLE_DATE == 1
 #include <date/date.h>
+#endif
+
+#if ENABLE_NLOHMANN_JSON == 1
 #include <nlohmann/json.hpp>
+using nlohmann::json;
+#endif
+
+#if ENABLE_STDUUID == 1
 #include <stduuid/uuid.h>
+#endif
 
 using std::make_shared;
 using std::shared_ptr;
@@ -45,8 +54,6 @@ using std::stringstream;
 using std::cout;
 using std::cin;
 using std::endl;
-
-using nlohmann::json;
 
 using byte		= unsigned char;
 using sbyte	= char;
