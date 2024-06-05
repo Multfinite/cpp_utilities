@@ -1,11 +1,12 @@
 # https://github.com/Multfinite/cpp_utilities
 cmake_minimum_required (VERSION 3.8)
 
+project("utilities")
+message("project: utilities")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project("utilities")
-message("project: utilities")
 message("CXX `${CMAKE_CXX_STANDARD}`")
 message("CXX_FLAGS `${CMAKE_CXX_FLAGS}`")
 message("C_FLAGS `${CMAKE_C_FLAGS}`")
@@ -55,6 +56,14 @@ add_library (utilities_lib STATIC ${src})
 add_subdirectory("tiny-process-library")
 
 target_link_libraries (utilities_lib LINK_PUBLIC -Wl,--allow-multiple-definition tiny-process-library -Wl,--allow-multiple-definition)
+
+find_package(date CONFIG)
+if(TARGET date OR date_FOUND)
+    target_link_libraries(utilities_lib PUBLIC date)
+    add_compile_definitions(ENABLE_DATE=1)
+else()
+    message("date not found, disable related features.")
+endif()
 
 find_package(nlohmann_json CONFIG)
 if(TARGET nlohmann_json OR nlohmann_json_FOUND)
