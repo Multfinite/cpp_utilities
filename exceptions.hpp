@@ -6,9 +6,9 @@
 #include <exception>
 #include <stdexcept>
 
-#ifdef UTILITIES_EXCEPTIONS_USE_JSON
+#if ENABLE_NLOHMANN_JSON == 1
 #include <nlohmann/json.hpp>
-#endif //UTILITIES_EXCEPTIONS_USE_JSON
+#endif //ENABLE_NLOHMANN_JSON
 
 namespace Exceptions
 {	
@@ -30,7 +30,7 @@ namespace Exceptions
 			Line(line)
 		{ }
 	
-#ifdef UTILITIES_EXCEPTIONS_USE_JSON
+#if ENABLE_NLOHMANN_JSON == 1
 		inline nlohmann::json format_block() const
 		{
 			using nlohmann::json;
@@ -40,15 +40,15 @@ namespace Exceptions
 	
 			string msg = what();
 	
-			block["file"]					= File;
-			block["line"]					= Line;
-			block["function"]			= Function;
-			block["message"]			= msg;
-			block["type"]					= typeid(this).name();
+			block["file"] = File;
+			block["line"] = Line;
+			block["function"] = Function;
+			block["message"] = msg;
+			block["type"] = typeid(this).name();
 	
 			return block;
 		}
-#endif //UTILITIES_EXCEPTIONS_USE_JSON
+#endif //ENABLE_NLOHMANN_JSON
 	};
 	
 	struct not_implemented_error : public base_error
