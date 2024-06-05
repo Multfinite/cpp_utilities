@@ -147,6 +147,18 @@ namespace Utilities
 
         return res;
     }
+
+    template<typename ...T>
+    std::string string_join(const std::string& separator, const T& ...items)
+    {
+        std::string s;
+        for(auto& item : items)
+        {
+            if(!s.empty()) s += separator;
+            s += std::to_string(item);
+        }
+        return s;
+    }
 }
 
 #include <thread>
