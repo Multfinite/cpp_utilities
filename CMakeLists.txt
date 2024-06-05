@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 project("utilities")
-message("project: utilities")
+message("project: utilities\n-----------------------------------")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -91,5 +91,3 @@ endif()
 
 #find_package(utf8cpp CONFIG REQUIRED)
 #target_link_libraries(utilities_lib PRIVATE utf8cpp)
-
-message("project: utilities - done")
