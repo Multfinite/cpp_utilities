@@ -8,7 +8,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string_view>
 #include <string>
 
 #include <memory>
@@ -18,7 +17,7 @@
 #include <list>
 #include <map>
 #include <functional>
-#include <optional>
+#include "optional.hpp"
 
 #include <chrono>
 
@@ -41,13 +40,11 @@ using std::unique_ptr;
 using std::ifstream;
 using std::ostream;
 using std::function;
-using std::optional;
 
 using std::list;
 using std::map;
 using std::vector;
 
-using std::string_view;
 using std::string;
 using std::stringstream;
 
