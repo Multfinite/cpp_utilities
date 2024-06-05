@@ -1,10 +1,13 @@
 #ifndef UTILITIES_EXCEPTIONS_REST_HPP
 #define UTILITIES_EXCEPTIONS_REST_HPP
 
+#include <string>
+
 #include "exceptions.hpp"
 
 namespace Exceptions::REST
 {
+	using std::string;
 	/*!
 	* @author multfinite@gmail.com (multfinite)
 	* @brief An error occured by service code. This error class provides some functions to provide information to HttpEndpoint about responding.
@@ -18,21 +21,21 @@ namespace Exceptions::REST
 		* @brief HTTP status code which will be sent back with response.
 		* @return [int64_t] HTTP response code.
 		*/
-		virtual int64_t										get_code()		const { return 500; /*INTERNAL_SERVER_ERROR;*/ }
-#ifdef UTILITIES_EXCEPTIONS_USE_JSON
+		virtual int64_t get_code() const { return 500; /*INTERNAL_SERVER_ERROR;*/ }
+#if ENABLE_NLOHMANN_JSON == 1
 		/*!
 		* @author multfinite@gmail.com (multfinite)
 		* @brief HTTP status code which will be sent back with response.
 		* @return [int64_t] HTTP response code.
 		*/
-		virtual nlohmann::json							get_detail()	const { return nlohmann::json::parse("{}"); }
-#endif //UTILITIES_EXCEPTIONS_USE_JSON
+		virtual nlohmann::json get_detail() const { return nlohmann::json::parse("{}"); }
+#endif //ENABLE_NLOHMANN_JSON
 		/*!
 		* @author multfinite@gmail.com (multfinite)
 		* @brief Should be exception thrown.
 		* @return [boolean] if true exception will be raised, otherwise false.
 		*/
-		virtual bool											raise()			const { return false; }
+		virtual bool raise() const { return false; }
 	};
 
 	/*!
