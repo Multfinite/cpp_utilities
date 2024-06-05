@@ -1,9 +1,8 @@
 #ifndef UTILITIES_PATHFINDING_HPP
 #define UTILITIES_PATHFINDING_HPP
 
-#include "graph.hpp";
-
-#include <optional>
+#include "graph.hpp"
+#include "optional.hpp"
 
 namespace Utilities::Pathfinding
 {
@@ -28,10 +27,10 @@ namespace Utilities::Pathfinding
         /*!
          * @brief Total cost from root to this
          */
-        std::optional<cost_type> Cost;
+        optional<cost_type> Cost;
 
-        VertexNode(const vertex_type& owner) : __linked_node(owner) { clear(); }
-        VertexNode(const vertex_type& owner, size_t index) : __linked_node(owner, index) { clear(); }
+        VertexNode(const vertex_type& owner) : __linked_node<TVertex>(owner) { clear(); }
+        VertexNode(const vertex_type& owner, size_t index) : __linked_node<TVertex>(owner, index) { clear(); }
         ~VertexNode() = default;
 
         template<typename TPathType = std::vector<std::reference_wrapper<vertex_type>>>
@@ -51,10 +50,7 @@ namespace Utilities::Pathfinding
         {
             auto* v = &this;
             while (v != nullptr)
-            {
-                path.pop_back(*v);
                 v = v->Pathfinding->Previous;
-            }
             return *v;
         }
 
@@ -62,7 +58,7 @@ namespace Utilities::Pathfinding
         {
             Previous = nullptr;
             State = VertexState::Unhandled;
-            Cost = std::nullopt;
+            Cost = nullopt;
         }
     };
 
@@ -79,17 +75,17 @@ namespace Utilities::Pathfinding
         /*!
          * @brief Atomic transferring cost of this edge
          */
-        std::optional<cost_type> Cost;
+        optional<cost_type> Cost;
 
-        EdgeNode(const edge_type& owner) : __linked_node(owner) { clear(); }
-        EdgeNode(const edge_type& owner, size_t index) : __linked_node(owner, index) { clear(); }
+        EdgeNode(const edge_type& owner) : __linked_node<TEdge>(owner) { clear(); }
+        EdgeNode(const edge_type& owner, size_t index) : __linked_node<TEdge>(owner, index) { clear(); }
         ~EdgeNode() = default;
 
         void clear()
         {
-            Cost = std::nullopt;
+            Cost = nullopt;
         }
-    }
+    };
 
     template<typename TGraph, typename TCostType = double>
 #if HAS_CONCEPTS
@@ -107,19 +103,19 @@ namespace Utilities::Pathfinding
         std::vector<vertex_node_type> Vertexes;
         std::vector<edge_node_type> Edges;
 
-        GraphNode(const graph_type& owner) : __linked_node(owner) { init(); }
-        GraphNode(const graph_type& owner, size_t index) : __linked_node(owner, index) { init(); }
+        GraphNode(const graph_type& owner) : __linked_node<TGraph>(owner) { init(); }
+        GraphNode(const graph_type& owner, size_t index) : __linked_node<TGraph>(owner, index) { init(); }
         ~GraphNode() = default;
 
         void init()
         {
-            Vertexes.reserve(Graph.Vertexes.size());
-            for (auto& v : Graph.Vertexes)
-                Vertexes.emplace_back(v, Index);
+            Vertexes.reserve(this->Owner.Vertexes.size());
+            for (auto& v : this->Owner.Vertexes)
+                Vertexes.emplace_back(v, this->Index);
 
-            Edges.reserve(Graph.Edges.size());
-            for (auto& e : Graph.Edges)
-                Edges.emplace_back(e, Index);
+            Edges.reserve(this->Owner.Edges.size());
+            for (auto& e : this->Owner.Edges)
+                Edges.emplace_back(e, this->Index);
         }
 
         void clear()
@@ -130,11 +126,11 @@ namespace Utilities::Pathfinding
 
         inline vertex_node_type& node_of(const vertex_type& v) const
         {
-            return v.__linking.as_ref<vertex_node_type>(Index);
+            return v.__linking.template as_ref<vertex_node_type>(this->Index);
         }
         inline edge_node_type& node_of(const edge_type& v) const
         {
-            return v.__linking.as_ref<vertex_node_type>(Index);
+            return v.__linking.template as_ref<vertex_node_type>(this->Index);
         }
     };
 #if HAS_CONCEPTS
@@ -176,7 +172,7 @@ namespace Utilities::Pathfinding
     {
     public:
         using cost_type = TCostType;
-        using graph_type = typename TGraph;
+        using graph_type = TGraph;
         using vertex_type = typename graph_type::vertex_type;
         using vertex_ptr = vertex_type*;
         using edge_type = typename graph_type::edge_type;
@@ -195,7 +191,7 @@ namespace Utilities::Pathfinding
         BFS(const graph_type& graph, const TCostEvaluator& evaluator)
             : Graph(graph), GraphNode(graph), Evaluator(evaluator)
         {}
-        BFS(const graph_type& graph) : BFS(graph, default(TCostEvaluator)) {}
+        BFS(const graph_type& graph) : BFS(graph, TCostEvaluator{}) {}
         ~BFS() = default;
 
         path_type operator()(const vertex_type& from, const vertex_type& to)
