@@ -1,5 +1,6 @@
 #ifndef UTILITIES_JSON_HPP
 #define UTILITIES_JSON_HPP
+#if ENABLE_NLOHMANN_JSON == 1
 
 #include <string>
 #include <memory>
@@ -119,4 +120,5 @@ namespace Utilities::JSON
 
 #define validate_json_object_(item, requiredKeys) Utilities::validate_json_object(__FUNCTION__, __FILE__, __LINE__, item, requiredKeys)
 
+#endif // ENABLE_NLOHMANN_JSON
 #endif // UTILITIES_JSON_HPP
