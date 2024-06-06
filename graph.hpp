@@ -221,7 +221,8 @@ namespace Utilities
         {
             return Between(from, to, edge_data_type{});
         }
-        edge_type& Between(const vertex_type& from, const vertex_type& to, const edge_data_type& context)
+        template<typename TArgs...>
+        edge_type& Between(const vertex_type& from, const vertex_type& to, TArgs... args)
         {
             try
             {
@@ -229,7 +230,7 @@ namespace Utilities
             }
             catch (const Exceptions::item_not_found_exception&)
             {
-                return Edges.emplace_back(from, to, context);
+                return Edges.emplace_back(from, to, ...args);
             }
         }
 
