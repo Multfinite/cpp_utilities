@@ -184,6 +184,14 @@ namespace Utilities
         return ss.str();
     }
 
+    inline std::string string_between(std::string::const_iterator a, std::string::const_iterator b)
+    {
+        std::stringstream ss;
+        for(++a; a != b; a++)
+            ss << *b;
+        return ss.str();
+    }
+
     std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
         if(right <= left) throw "right <= left";
