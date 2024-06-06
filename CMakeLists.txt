@@ -1,7 +1,7 @@
 # https://github.com/Multfinite/cpp_utilities
 cmake_minimum_required (VERSION 3.8)
 
-project("utilities")
+#project("utilities")
 message("project: utilities\n-----------------------------------")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -27,11 +27,11 @@ endif()
 
 # test that filesystem header actually is there and works
 try_compile(HAS_FS "${CMAKE_BINARY_DIR}/temp"
-"${PROJECT_SOURCE_DIR}/tests/has_filesystem.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_filesystem.cpp"
             CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
             LINK_LIBRARIES stdc++fs)
 try_compile(HAS_FS_EXPERIMENTAL "${CMAKE_BINARY_DIR}/temp"
-"${PROJECT_SOURCE_DIR}/tests/has_experimental_filesystem.cpp"
+"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_experimental_filesystem.cpp"
             CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
             LINK_LIBRARIES stdc++fs)
 
