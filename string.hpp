@@ -163,8 +163,7 @@ namespace Utilities
     std::string::size_type string_indexof(const std::string& s, char c)
     {
         auto iter = std::find_if(s.cbegin(), s.cend(), [&c](char chr) { return chr == c; });
-        if(iter == s.cend())
-            throw "not found";
+        if(iter == s.cend()) throw "not found";
         auto index = iter - s.cbegin();
         return index;
     }
@@ -172,11 +171,13 @@ namespace Utilities
     std::string string_between(const std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
+        if(ir <= il) throw "ir <= il";
         return s.substr(il, (ir - il) + 1);
     }
 
     std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
+        if(right <= left) throw "right <= left";
         return s.substr(0, left + 1) + s.substr(right + 1, s.size() - (left + 1));
     }
 
