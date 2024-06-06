@@ -7,6 +7,7 @@
 #include <list>
 #include <map>
 #include <algorithm>
+#include <sstream>
 
 #if STD_FS == 1
     #include <string_view>
@@ -173,6 +174,14 @@ namespace Utilities
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         if(ir <= il) throw "ir <= il";
         return s.substr(il, (ir - il) + 1);
+    }
+
+    inline std::string string_between(std::string::iterator a, std::string::iterator b)
+    {
+        std::stringstream ss;
+        for(++a; a != b; a++)
+            ss << *b;
+        return ss.str();
     }
 
     std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
