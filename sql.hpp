@@ -7,21 +7,21 @@
 
 namespace Utilities::SQL
 {
-	std::string as_sql(const std::string& v) { return "'" + v + "'"; };
-	std::string as_sql(const char* v) { return "'" + std::string(v) + "'"; };
-	std::string as_sql(std::string_view v) { return "'" + std::string(v.data()) + "'"; };
-	std::string as_sql(uint8_t v) { return std::to_string(v); }
-	std::string as_sql(uint16_t v) { return std::to_string(v); }
-	std::string as_sql(uint32_t v) { return std::to_string(v); }
-	std::string as_sql(uint64_t v) { return std::to_string(v); }
-	std::string as_sql(int8_t v) { return std::to_string(v); }
-	std::string as_sql(int16_t v) { return std::to_string(v); }
-	std::string as_sql(int32_t v) { return std::to_string(v); }
-	std::string as_sql(int64_t v) { return std::to_string(v); }
-	std::string as_sql(double v) { return std::to_string(v); }
-	std::string as_sql(float v) { return std::to_string(v); }
+        inline std::string as_sql(const std::string& v) { return "'" + v + "'"; };
+        inline std::string as_sql(const char* v) { return "'" + std::string(v) + "'"; };
+        inline std::string as_sql(std::string_view v) { return "'" + std::string(v.data()) + "'"; };
+        inline std::string as_sql(uint8_t v) { return std::to_string(v); }
+        inline std::string as_sql(uint16_t v) { return std::to_string(v); }
+        inline std::string as_sql(uint32_t v) { return std::to_string(v); }
+        inline std::string as_sql(uint64_t v) { return std::to_string(v); }
+        inline std::string as_sql(int8_t v) { return std::to_string(v); }
+        inline std::string as_sql(int16_t v) { return std::to_string(v); }
+        inline std::string as_sql(int32_t v) { return std::to_string(v); }
+        inline std::string as_sql(int64_t v) { return std::to_string(v); }
+        inline std::string as_sql(double v) { return std::to_string(v); }
+        inline std::string as_sql(float v) { return std::to_string(v); }
 
-	string select_page(const string& what, const string& from, size_t page, size_t perpage)
+        inline string select_page(const string& what, const string& from, size_t page, size_t perpage)
 	{
 		string q = "select %what% from %from% limit %limit% offset %offset%";
 		string_replace_all_templates(q,
@@ -34,7 +34,7 @@ namespace Utilities::SQL
 		return q;
 	}
 
-	string select_page_with_condition(const string& what, const string& from, const string& condition, size_t page, size_t perpage)
+        inline string select_page_with_condition(const string& what, const string& from, const string& condition, size_t page, size_t perpage)
 	{
 		string q = "select %what% from %from% where %condition% limit %limit% offset %offset%";
 		string_replace_all_templates(q,
@@ -48,7 +48,7 @@ namespace Utilities::SQL
 		return q;
 	}
 
-	string count_rows(const string& from)
+        inline string count_rows(const string& from)
 	{
 		string q = "select count(*) as rows from %from%";
 		string_replace_all_templates(q,
@@ -59,7 +59,7 @@ namespace Utilities::SQL
 	}
 
 	template<typename ItBegin, typename ItEnd>
-	string where_in(const string& what, ItBegin begin, ItEnd end)
+        inline string where_in(const string& what, ItBegin begin, ItEnd end)
 	{
 		stringstream ss;
 		ss << what << " in (";
@@ -76,7 +76,7 @@ namespace Utilities::SQL
 		return ss.str();
 	}
 	template<typename ItBegin, typename ItEnd, typename TExtractor>
-	string where_in(const string& what, ItBegin begin, ItEnd end, const TExtractor& extractor)
+        inline string where_in(const string& what, ItBegin begin, ItEnd end, const TExtractor& extractor)
 	{
 		stringstream ss;
 		ss << what << " in (";
