@@ -152,13 +152,20 @@ namespace Utilities
     template<typename ...T>
     std::string string_join(const std::string& separator, const T& ...items)
     {
-        std::string s;
+        std::stringstream s; bool f = true;
+        /*
         for(auto& item : {items...})
         {
-            if(!s.empty()) s += separator;
-            s += std::to_string(item);
+            if(f) { s << separator; f = true; }
+            s << item;
         }
-        return s;
+        */
+        ([&]
+        {
+            if(f) { s << separator; f = true; }
+            s << items;
+        }, ...);
+        return s.str();
     }
 
     std::string::size_type string_indexof(const std::string& s, char c)
