@@ -13,7 +13,7 @@
 
 namespace Utilities::SQL
 {
-	std::string as_sql(const nlohmann::json& v) { return "'" + v.dump() + "'::json"; };
+        inline std::string as_sql(const nlohmann::json& v) { return "'" + v.dump() + "'::json"; };
 }
 
 namespace Utilities::JSON
@@ -68,7 +68,7 @@ namespace Utilities::JSON
 	}
 	
 	template<typename T>
-	T json_value_or(nlohmann::json& j, std::string key, T defaultValue)
+        inline T json_value_or(nlohmann::json& j, std::string key, T defaultValue)
 	{
 		if (j.contains(key))
 			return (T)j[key];
