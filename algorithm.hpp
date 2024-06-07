@@ -115,7 +115,7 @@ namespace Utilities
          * @arg c: object-destination
          */
         template<typename T>
-        void clone(const T& o, T& c);
+        inline void clone(const T& o, T& c);
 }
 
 #endif // UTILITIES_ALGORITHM_HPP
