@@ -172,7 +172,7 @@ namespace Utilities
     {
         auto iter = std::find_if(s.cbegin(), s.cend(), [&c](char chr) { return chr == c; });
         if(iter == s.cend()) throw "not found";
-        auto index = iter - s.cbegin();
+        auto index = (iter - s.cbegin()) /*<- this is not index*/;
         return index;
     }
 
@@ -202,20 +202,37 @@ namespace Utilities
     inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
         if(right <= left) throw "right <= left";
-        return s.substr(0, left + 1) + s.substr(right + 1, s.size() - (left + 1));
+        std::stringstream ss;
+        for(auto i = 0; i < s.size(); ++i)
+        {
+            if(i > left && i < right) continue;
+            ss << s[i];
+        }
+        return ss.str();
+    }
+
+    inline std::string string_remove_range(const std::string& s, std::string::size_type left, std::string::size_type right)
+    {
+        if(right <= left) throw "right <= left";
+        std::stringstream ss;
+        for(auto i = 0; i < s.size(); ++i)
+        {
+            if(i >= left && i <= right) continue;
+            ss << s[i];
+        }
+        return ss.str();
     }
 
     inline std::string string_extract(std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         auto between = s.substr(il, (ir - il) + 1);
-        s = string_remove_between(s, il, ir);
+        s = string_remove_range(s, il, ir);
         return between;
     }
 }
 
 #include <thread>
-#include <sstream>
 
 namespace std
 {
