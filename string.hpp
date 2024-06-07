@@ -41,7 +41,7 @@ namespace Utilities
     
     /* https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf */
     template<typename ... Args>
-    std::string string_format(const std::string& format, Args ... args)
+    inline std::string string_format(const std::string& format, Args ... args)
     {
         int size_s = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
         if (size_s <= 0) { throw std::runtime_error("Error during formatting."); }
@@ -109,7 +109,7 @@ namespace Utilities
         }
     }
     
-    std::list<std::string> string_split(const std::string& str, const std::string& delimiter)
+    inline std::list<std::string> string_split(const std::string& str, const std::string& delimiter)
     {
         std::string s = str;
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
@@ -128,7 +128,7 @@ namespace Utilities
         return res;
     }
 
-    std::list<std::string> string_split_ret_s(const std::string& s, const std::string& delimiter)
+    inline std::list<std::string> string_split_ret_s(const std::string& s, const std::string& delimiter)
     {
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;
@@ -150,7 +150,7 @@ namespace Utilities
     }
 
     template<typename ...T>
-    std::string string_join(const std::string& separator, const T& ...items)
+    inline std::string string_join(const std::string& separator, const T& ...items)
     {
         std::stringstream s; bool f = true;
         /*
@@ -168,7 +168,7 @@ namespace Utilities
         return s.str();
     }
 
-    std::string::size_type string_indexof(const std::string& s, char c)
+    inline std::string::size_type string_indexof(const std::string& s, char c)
     {
         auto iter = std::find_if(s.cbegin(), s.cend(), [&c](char chr) { return chr == c; });
         if(iter == s.cend()) throw "not found";
@@ -176,7 +176,7 @@ namespace Utilities
         return index;
     }
 
-    std::string string_between(const std::string& s, char left, char right)
+    inline std::string string_between(const std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         if(ir <= il) throw "ir <= il";
@@ -199,13 +199,13 @@ namespace Utilities
         return ss.str();
     }
 
-    std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
+    inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
         if(right <= left) throw "right <= left";
         return s.substr(0, left + 1) + s.substr(right + 1, s.size() - (left + 1));
     }
 
-    std::string string_extract(std::string& s, char left, char right)
+    inline std::string string_extract(std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         auto between = s.substr(il, (ir - il) + 1);
