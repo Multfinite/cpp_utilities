@@ -194,6 +194,7 @@ namespace Utilities
     class Graph
     {
     public:
+        using graph_type = Graph<TVertex, TEdge, TData>;
         using data_type = TData;
         using vertex_type = TVertex;
         using edge_type = TEdge;
@@ -211,6 +212,10 @@ namespace Utilities
         Graph(size_t vertices)
         {
             Vertexes.resize(vertices);
+        }
+        Graph(const graph_type& other)
+        {
+            clone(other, *this);
         }
 
         static edge_type& EdgeTo(vertex_type& from, vertex_type& to)
