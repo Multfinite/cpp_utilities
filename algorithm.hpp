@@ -47,7 +47,7 @@ namespace Utilities
         {
             while(cb != ce)
             {
-                if(&*cb == &_Val) break;
+                if(*cb == _Val) break;
                 ++cb; ++ lb;
             }
             return lb;
