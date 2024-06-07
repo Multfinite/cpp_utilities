@@ -42,6 +42,48 @@ namespace Utilities
                 return iterator;
         }
 
+        template<typename InputIt, typename LinkedIt, typename T>
+        auto find_linked(InputIt cb, InputIt ce, LinkedIt lb, const T& _Val)
+        {
+            while(cb != ce)
+            {
+                if(&*cb == &_Val) break;
+                ++cb; ++ lb;
+            }
+            return lb;
+        }
+
+        template<typename TContainer, typename TLinkedContainer, typename T>
+        auto find_linked(const TContainer& container, const TLinkedContainer& linked, const T& _Val)
+            -> decltype (linked.begin(), linked.end())
+        {
+            auto li = find_linked(container.begin(), container.end(), linked.begin(), _Val);
+            if (li == linked.end())
+                throw construct_error_no_msg(Exceptions::item_not_found_exception);
+            return li;
+        }
+
+        template<typename InputIt, typename LinkedIt, typename TPredicate>
+        auto find_linked_if(InputIt cb, InputIt ce, LinkedIt lb, const TPredicate& pred)
+        {
+            while(cb != ce)
+            {
+                if(pred(*cb)) break;
+                ++cb; ++ lb;
+            }
+            return lb;
+        }
+
+        template<typename TContainer, typename TLinkedContainer, typename TPredicate>
+        auto find_linked_if(const TContainer& container, const TLinkedContainer& linked, const TPredicate& pred)
+            -> decltype (linked.begin(), linked.end())
+        {
+            auto li = find_linked_if(container.begin(), container.end(), linked.begin(), pred);
+            if (li == linked.end())
+                throw construct_error_no_msg(Exceptions::item_not_found_exception);
+            return li;
+        }
+
         template<typename TOutContainer, typename TInContainer, typename TConverter>
         auto as(const TInContainer& _In, const TConverter& _Func) ->
                 decltype(_In.cbegin(), _In.cend(), _In.size(), TOutContainer{})
