@@ -186,16 +186,16 @@ namespace Utilities
     inline std::string string_between(std::string::iterator a, std::string::iterator b)
     {
         std::stringstream ss;
-        for(++a; a != b; a++)
-            ss << *b;
+        for(++a; a != b; ++a)
+            ss << *a;
         return ss.str();
     }
 
     inline std::string string_between(std::string::const_iterator a, std::string::const_iterator b)
     {
         std::stringstream ss;
-        for(++a; a != b; a++)
-            ss << *b;
+        for(++a; a != b; ++a)
+            ss << *a;
         return ss.str();
     }
 
