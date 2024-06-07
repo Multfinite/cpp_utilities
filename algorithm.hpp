@@ -67,14 +67,13 @@ namespace Utilities
                 return iterator != container.end();
         }
 
-        template<typename... Types>
-        inline void clear(Types... args)
-        {
-            for(const auto c : {args...})
-            {
-                c.clear();
-            }
-        }
+        /*!
+         * @brief Clone (deep copy) object. Must be specialized before - it's just interface.
+         * @arg o: object-source
+         * @arg c: object-destination
+         */
+        template<typename T>
+        void clone(const T& o, T& c);
 }
 
 #endif // UTILITIES_ALGORITHM_HPP
