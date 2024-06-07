@@ -24,20 +24,20 @@ namespace Utilities
         }
 
         template<typename TContainer>
-        auto find(const TContainer& container, const typename TContainer::value_type& _Val) ->
+        auto find(const TContainer& container, const typename TContainer::value_type& _Val, bool raise = true) ->
                 decltype(container.begin(), container.end())
         {
                 auto iterator = std::find(container.begin(), container.end(), _Val);
-                if (iterator == container.end())
+                if (raise && iterator == container.end())
                         throw construct_error_no_msg(Exceptions::item_not_found_exception);
                 return iterator;
         }
         template<typename TContainer, typename TPredicate>
-        auto find_if(const TContainer& container, const TPredicate& pred) ->
+        auto find_if(const TContainer& container, const TPredicate& pred, bool raise = true) ->
                 decltype(container.begin(), container.end())
         {
                 auto iterator = std::find_if(container.begin(), container.end(), pred);
-                if (iterator == container.end())
+                if (raise && iterator == container.end())
                         throw construct_error_no_msg(Exceptions::item_not_found_exception);
                 return iterator;
         }
@@ -54,11 +54,11 @@ namespace Utilities
         }
 
         template<typename TContainer, typename TLinkedContainer, typename T>
-        auto find_linked(const TContainer& container, const TLinkedContainer& linked, const T& _Val)
+        auto find_linked(const TContainer& container, const TLinkedContainer& linked, const T& _Val, bool raise = true)
             -> decltype (linked.begin(), linked.end())
         {
             auto li = find_linked(container.begin(), container.end(), linked.begin(), _Val);
-            if (li == linked.end())
+            if (raise && li == linked.end())
                 throw construct_error_no_msg(Exceptions::item_not_found_exception);
             return li;
         }
@@ -75,11 +75,11 @@ namespace Utilities
         }
 
         template<typename TContainer, typename TLinkedContainer, typename TPredicate>
-        auto find_linked_if(const TContainer& container, const TLinkedContainer& linked, const TPredicate& pred)
+        auto find_linked_if(const TContainer& container, const TLinkedContainer& linked, const TPredicate& pred, bool raise = true)
             -> decltype (linked.begin(), linked.end())
         {
             auto li = find_linked_if(container.begin(), container.end(), linked.begin(), pred);
-            if (li == linked.end())
+            if (raise && li == linked.end())
                 throw construct_error_no_msg(Exceptions::item_not_found_exception);
             return li;
         }
