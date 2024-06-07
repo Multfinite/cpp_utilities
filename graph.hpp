@@ -95,8 +95,10 @@ namespace Utilities
         edges_type Edges, IncomingEdges, OutcomingEdges;
         vertexes_type Neighbors, IncomingNeighbors, OutcomingNeighbors;
 
-        Vertex(const data_type& context) : Context(context) {}
-        Vertex() : Vertex(data_type{}) {}
+        Vertex() = default;
+        Vertex(data_type&& context) : Context(context) {}
+        template<typename ...TArgs>
+        Vertex(TArgs&& ...args) : Context(args...) {}
 
         void clear()
         {
@@ -125,24 +127,29 @@ namespace Utilities
         vertex_type& From;
         vertex_type& To;
 
-        Edge(const vertex_type& from, const vertex_type& to, const data_type& context) :
+        Edge(vertex_type& from, vertex_type& to, data_type&& context) :
             From(from), To(to), Context(context)
+        { link(); }
+         template<typename ...TArgs>
+        Edge(vertex_type& from, vertex_type& to, TArgs&&... args) :
+          From(from), To(to), Context(args...)
+        { link(); }
+        ~Edge() { unlink(); }
+    private:
+        inline void link()
         {
-            From.Neighbors.push_back(&to); From.OutcomingNeighbors.push_back(&to);
+            From.Neighbors.push_back(&To); From.OutcomingNeighbors.push_back(&To);
             From.Edges.push_back(this); From.OutcomingEdges.push_back(this);
 
-            To.Neighbors.push_back(&from); To.IncomingNeighbors.push_back(&from);
+            To.Neighbors.push_back(&From); To.IncomingNeighbors.push_back(&From);
             To.Edges.push_back(this); To.IncomingEdges.push_back(this);
         }
-        Edge(const vertex_type& from, const vertex_type& to) : Edge(from, to, data_type{}) {}
-        ~Edge()
+        inline void unlink()
         {
-             auto to = To; auto from = From;
-
-            From.Neighbors.remove(&to);  From.OutcomingNeighbors.remove(&to);
+            From.Neighbors.remove(&To);  From.OutcomingNeighbors.remove(&To);
             From.Edges.remove(this); From.OutcomingEdges.remove(this);
 
-            To.Neighbors.remove(&from); To.IncomingNeighbors.remove(&from);
+            To.Neighbors.remove(&From); To.IncomingNeighbors.remove(&From);
             To.Edges.remove(this); To.IncomingEdges.remove(this);
         }
     };
@@ -165,24 +172,29 @@ namespace Utilities
         vertex_type& From;
         vertex_type& To;
 
-        EdgeBidirectional(const vertex_type& from, const vertex_type& to, const data_type& context) :
+        EdgeBidirectional(vertex_type& from, vertex_type& to, data_type&& context) :
             From(from), To(to), Context(context)
+        { link(); }
+        template<typename ...TArgs>
+        EdgeBidirectional(vertex_type& from, vertex_type& to, TArgs&& ...args) :
+            From(from), To(to), Context(args...)
+        { link(); }
+        ~EdgeBidirectional() { unlink(); }
+    private:
+        inline void link()
         {
-            From.Neighbors.push_back(&to);  From.IncomingNeighbors.push_back(&to); From.OutcomingNeighbors.push_back(&to);
+            From.Neighbors.push_back(&To);  From.IncomingNeighbors.push_back(&To); From.OutcomingNeighbors.push_back(&To);
             From.Edges.push_back(this); From.IncomingEdges.push_back(this); From.OutcomingEdges.push_back(this);
 
-            To.Neighbors.push_back(&from); To.IncomingNeighbors.push_back(&from); To.OutcomingNeighbors.push_back(&from);
+            To.Neighbors.push_back(&From); To.IncomingNeighbors.push_back(&From); To.OutcomingNeighbors.push_back(&From);
             To.Edges.push_back(this); To.IncomingEdges.push_back(this); To.OutcomingEdges.push_back(this);
         }
-        EdgeBidirectional(const vertex_type& from, const vertex_type& to) : EdgeBidirectional(from, to, data_type{}) {}
-        ~EdgeBidirectional()
+        inline void unlink()
         {
-            auto to = To; auto from = From;
-
-            From.Neighbors.remove(&to);  From.IncomingNeighbors.remove(&to); From.OutcomingNeighbors.remove(&to);
+            From.Neighbors.remove(&To);  From.IncomingNeighbors.remove(&To); From.OutcomingNeighbors.remove(&To);
             From.Edges.remove(this); From.IncomingEdges.remove(this); From.OutcomingEdges.remove(this);
 
-            To.Neighbors.remove(&from); To.IncomingNeighbors.remove(&from); To.OutcomingNeighbors.remove(&from);
+            To.Neighbors.remove(&From); To.IncomingNeighbors.remove(&From); To.OutcomingNeighbors.remove(&From);
             To.Edges.remove(this); To.IncomingEdges.remove(this); To.OutcomingEdges.remove(this);
         }
     };
@@ -197,6 +209,7 @@ namespace Utilities
         using graph_type = Graph<TVertex, TEdge, TData>;
         using data_type = TData;
         using vertex_type = TVertex;
+        using vertex_data_type = typename vertex_type::data_type;
         using edge_type = TEdge;
         using edge_data_type = typename edge_type::data_type;
         using vertexes_type = std::vector<vertex_type>;
@@ -218,25 +231,41 @@ namespace Utilities
             clone(other, *this);
         }
 
-        static edge_type& EdgeTo(vertex_type& from, vertex_type& to)
-        {
-            return *find(to.IncomingNeighbors, from);
-        }
-        edge_type& Between(const vertex_type& from, const vertex_type& to)
-        {
-            return Between(from, to, edge_data_type{});
-        }
-        template<typename ...TArgs>
-        edge_type& Between(const vertex_type& from, const vertex_type& to, TArgs ...args)
+        static edge_type& EdgeTo(vertex_type& from, vertex_type& to) { return reference_cast(*find(to.IncomingNeighbors, &from)); }
+        static edge_type& EdgeTo(vertex_type const& from, vertex_type const& to) { return reference_cast(*find(to.IncomingNeighbors, &const_cast<vertex_type&>(from))); }
+
+        edge_type& Between(vertex_type& from, vertex_type& to, const vertex_data_type& context)
         {
             try
             {
-                return *find(to.IncomingNeighbors, from);
+                auto it = find(to.IncomingEdges, &from);
+                return *((edge_type*) *it);
+            }
+            catch (const Exceptions::item_not_found_exception&)
+            {
+                return Edges.emplace_back(from, to, context);
+            }
+        }
+        edge_type& Between(vertex_type const& from, vertex_type const& to, const vertex_data_type& context) { return Between(const_cast<vertex_type&>(from), const_cast<vertex_type&>(to), context); }
+
+        template<typename ...TArgs>
+        edge_type& Between(vertex_type& from, vertex_type& to, TArgs ...args)
+        {
+            try
+            {
+                auto it = find(to.IncomingEdges, &from);
+                return *((edge_type*) *it);
             }
             catch (const Exceptions::item_not_found_exception&)
             {
                 return Edges.emplace_back(from, to, args...);
             }
+        }
+
+        template<typename ...TArgs>
+        edge_type& Between(vertex_type const& from, vertex_type const& to, TArgs ...args)
+        {
+            return Between(const_cast<vertex_type&>(from), const_cast<vertex_type&>(to), args...);
         }
 
         void RemoveEdgesOf(vertex_type& vertex)
