@@ -205,7 +205,7 @@ namespace Utilities
         std::stringstream ss;
         for(auto i = 0; i < s.size(); ++i)
         {
-            if(i > left && i < right) continue;
+            if(i >= left && i <= right) continue;
             ss << s[i];
         }
         return ss.str();
@@ -217,7 +217,7 @@ namespace Utilities
         std::stringstream ss;
         for(auto i = 0; i < s.size(); ++i)
         {
-            if(i >= left && i <= right) continue;
+            if(i > left && i < right) continue;
             ss << s[i];
         }
         return ss.str();
