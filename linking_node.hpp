@@ -14,7 +14,6 @@ namespace Utilities
         linked_type Items;
         size_t ValidCount = 0;
 
-        size_t current_index() const { return Items.size() - 1; }
         size_t next_index() const { return Items.size(); }
         size_t free_index() const
         {
@@ -79,7 +78,7 @@ namespace Utilities
         size_t Index;
 
         __linked_node(value_type& owner, size_t index) : Owner(owner), Index(index) { link(); }
-        __linked_node(value_type& owner) : __linked_node(owner, owner.__linking.next_index()) { link(); }
+        __linked_node(value_type& owner) : Owner(owner), Index(owner.__linking.next_index()) { link(); }
         ~__linked_node() { unlink(); }
 
     private:
