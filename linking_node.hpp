@@ -85,7 +85,7 @@ namespace Utilities
     private:
         void link()
         {
-            Owner.__linking.set(Index, &this);
+            Owner.__linking.set(Index, this);
         }
         void unlink()
         {
