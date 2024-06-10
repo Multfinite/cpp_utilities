@@ -235,7 +235,7 @@ namespace Utilities
 
     inline bool string_starts_with(const std::string& s, const std::string& prefix)
     {
-#if CPP_SINCE(CPP20)
+#if CPP_SINCE(__cplusplus, CPP20)
         return s.starts_with(prefix);
 #else
         if(prefix.size() > s.size()) return false;
