@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include <iostream>
+
 #include "macro.hpp"
 
 #if STD_FS == 1
@@ -240,7 +242,7 @@ namespace Utilities
 #else
         if(prefix.size() > s.size()) return false;
         auto aIt = s.cbegin(); auto bIt = prefix.cbegin();
-        while(aIt != s.cend())
+        while(bIt != prefix.cend())
         {
             if(*aIt != *bIt) return false;
             ++aIt; ++bIt;
