@@ -205,7 +205,7 @@ namespace Utilities
         std::stringstream ss;
         for(auto i = 0; i < s.size(); ++i)
         {
-            if(i >= left && i <= right) continue;
+            if(i > left && i < right) continue;
             ss << s[i];
         }
         return ss.str();
@@ -217,7 +217,7 @@ namespace Utilities
         std::stringstream ss;
         for(auto i = 0; i < s.size(); ++i)
         {
-            if(i > left && i < right) continue;
+            if(i >= left && i <= right) continue;
             ss << s[i];
         }
         return ss.str();
@@ -226,7 +226,7 @@ namespace Utilities
     inline std::string string_extract(std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
-        auto between = s.substr(il, (ir - il) + 1);
+        auto between = s.substr(il + 1,((ir - il) + 1) - 2); // +1, -2 <= don't catch borders
         s = string_remove_range(s, il, ir);
         return between;
     }
