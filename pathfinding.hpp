@@ -42,7 +42,7 @@ namespace Utilities::Pathfinding
         using vertex_type = TVertex;
         using edge_type = TEdge;
         using cost_type = TCostType;
-        using vertex_node = VertexNode<vertex_type, edge_type, cost_type>;
+        using vertex_node_type = VertexNode<vertex_type, edge_type, cost_type>;
         using path_entry = PathEntry<vertex_type, edge_type>;
         using path_type_default = std::vector<std::reference_wrapper<path_entry>>;
 
@@ -60,30 +60,26 @@ namespace Utilities::Pathfinding
         template<typename TPathType = path_type_default>
         inline TPathType Build() const
         {
-            TPathType path;
-            Build(path);
-            return path;
-        }
-         template<typename TPathType = path_type_default>
-        inline void Build(TPathType& path) const
-        {
-            auto& v = *this;
-            while (v.Entry.has_value())
+            std::list<std::reference_wrapper<path_entry>> path;
+            vertex_node_type* v = const_cast<vertex_node_type*>(this);
+            while (v->Entry.has_value())
             {
-                path.push_front(v.Entry.value());
-                v = v.Entry.value().From.__linking.template as_ptr<vertex_node>(this->Index);
+                path_entry& entry = v->Entry.value();
+                path.push_front(entry);
+                v = entry.From.__linking.template as_ptr<vertex_node_type>(this->Index);
             }
+            return TPathType(path.begin(), path.end());
         }
 
-        void clear()
+        inline void clear()
         {
             Entry = nullopt;
             State = VertexState::Unhandled;
             Cost = nullopt;
         }
 
-        inline bool operator==(vertex_node const& other) const { return &this == &other; }
-        inline bool operator!=(vertex_node const& other) const { return &this != &other; }
+        inline bool operator==(vertex_node_type const& other) const { return &this == &other; }
+        inline bool operator!=(vertex_node_type const& other) const { return &this != &other; }
     };
 
     template<typename TEdge, typename TCostType = double>
@@ -220,16 +216,16 @@ namespace Utilities::Pathfinding
             nodeFrom.State = VertexState::Explored;
             nodeFrom.Cost = 0;
 
-            std::list<std::reference_wrapper<vertex_node_type>> reachable;
-            reachable.push_back(nodeFrom);
+            std::list<vertex_node_type*> reachable;
+            reachable.push_back(&nodeFrom);
             while (!reachable.empty())
             {
-                vertex_node_type& nodeCurrent = reachable.front(); reachable.pop_front();
+                vertex_node_type& nodeCurrent = *reachable.front(); reachable.pop_front();
                 vertex_type const& current = nodeCurrent.Owner;
                 if (&nodeCurrent == &nodeTo)
                     return nodeCurrent.template Build<TPathType>();
 
-                reachable.remove(nodeCurrent);
+                reachable.remove(&nodeCurrent);
                 nodeCurrent.State = VertexState::Explored;
 
                 for (void* pEdge : current.OutcomingEdges)
@@ -242,7 +238,7 @@ namespace Utilities::Pathfinding
                     if (nodeAdjacent.State == VertexState::Unhandled)
                     {
                         nodeAdjacent.State = VertexState::Queued;
-                        reachable.push_back(nodeAdjacent);
+                        reachable.push_back(&nodeAdjacent);
                     }
                     const bool isCostPresent = nodeAdjacent.Cost.has_value();
                     const cost_type fullCost = nodeCurrent.Cost.value() + nodeEdge.Cost.value();
