@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include "macro.hpp"
+
 #if STD_FS == 1
     #include <string_view>
 
@@ -229,6 +231,22 @@ namespace Utilities
         auto between = s.substr(il + 1,((ir - il) + 1) - 2); // +1, -2 <= don't catch borders
         s = string_remove_range(s, il, ir);
         return between;
+    }
+
+    inline bool string_starts_with(const std::string& s, const std::string& prefix)
+    {
+#if CPP_SINCE(CPP20)
+        return s.starts_with(prefix);
+#else
+        if(prefix.size() > s.size()) return false;
+        auto aIt = s.cbegin(); auto bIt = prefix.cbegin();
+        while(aIt != s.cend())
+        {
+            if(*aIt != *bIt) return false;
+            ++aIt; ++bIt;
+        }
+        return true;
+#endif
     }
 }
 
