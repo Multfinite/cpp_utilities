@@ -29,14 +29,15 @@ namespace Utilities
             while (Items.size() <= index)
                 Items.push_back(nullptr);
             Items[index] = ptr;
-            ValidCount++;
+            ++ValidCount;
         }
         void reset(size_t index)
         {
+            if(ValidCount == 0) return;
             while (Items.size() <= index)
                 Items.push_back(nullptr);
             Items[index] = nullptr;
-            ValidCount--;
+            --ValidCount;
         }
         void clear()
         {
@@ -44,11 +45,11 @@ namespace Utilities
             ValidCount = 0;
         }
 
-        template<typename T>
-        T& as_ref(size_t index) const { return (T&)Items[index]; }
 
         template<typename T>
-        T* as_ptr(size_t index) const { return (T*)Items[index]; }
+        T* as_ptr(size_t index) const { return const_cast<T*>(reinterpret_cast<T const*>(Items.at(index))); }
+        template<typename T>
+        T& as_ref(size_t index) const { return *as_ptr<T>(index); }
     };
 #if HAS_CONCEPTS
     template<typename T>
@@ -60,13 +61,13 @@ namespace Utilities
     };
 #endif
 
-    template<typename T>
+    template<typename TLinkable>
 #if HAS_CONCEPTS
         requires HasLinkingNode<T>
 #endif
     struct __linked_node
     {
-        using value_type = T;
+        using value_type = TLinkable;
 
         /*!
          * @brief This node attached to this object
