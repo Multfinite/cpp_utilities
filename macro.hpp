@@ -16,14 +16,38 @@
 #define CPP_UNTIL(x, H) x < H
 #define CPP_BETWEEN(x, L, H) x < H && x >= L
 
+#include <cstdlib>
+
 template<typename T>
-inline T& reference_cast(T* ptr) { return (T&)*ptr; /* reinterpret_cast<T&>(ptr); */ }
+inline T& reference_cast(T* ptr)
+{
+    if(!ptr) throw "POINTER IS NULL";
+    return *ptr;
+}
+template<typename T>
+inline T& reference_cast(void* ptr)
+{
+    if(!ptr) throw "POINTER IS NULL";
+    return *reinterpret_cast<T*>(ptr);
+}
+template<typename T>
+inline T const& reference_cast(T const* ptr)
+{
+    if(!ptr) throw "POINTER IS NULL";
+    return *ptr;
+}
+template<typename T>
+inline T const& reference_cast(void const* ptr)
+{
+    if(!ptr) throw "POINTER IS NULL";
+    return *reinterpret_cast<T const*>(ptr);
+}
 
 template<typename T>
 inline T* offset_ptr(void* ptr, size_t offset = 0)
 {
-	unsigned char* pointer = static_cast<unsigned char*>(ptr) + offset;
-	return reinterpret_cast<T*>(pointer);
+    unsigned char* pointer = static_cast<unsigned char*>(ptr) + offset;
+    return reinterpret_cast<T*>(pointer);
 }
 
 #if CPP_SINCE(__cplusplus, CPP20)
