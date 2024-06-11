@@ -9,13 +9,28 @@
 
 namespace Utilities::Pathfinding
 {
+    /*!
+     * @brief Don't put nodes to a containers to mark them as being in some stte. Use this enum instead which valua attached to node itself
+     */
     enum struct VertexState : unsigned char
     {
+        /*!
+          * @brief Vertex did not appear yet.
+          */
         Unhandled = 0,
+        /*!
+          * @brief This vertex is contained in queue to be processed.
+          */
         Queued = 1,
+        /*!
+          * @brief All neigbors are processed.
+          */
         Explored = 255
     };
 
+    /*!
+     * @brief Contains a way how current VertexNode is reached ("Parent")
+     */
     template<typename TVertex, typename TEdge>
 #if HAS_CONCEPTS
         requires IsVertex<TVertex> && IsEdge<TEdge>
@@ -46,6 +61,9 @@ namespace Utilities::Pathfinding
         using path_entry = PathEntry<vertex_type, edge_type>;
         using path_type_default = std::vector<std::reference_wrapper<path_entry>>;
 
+        /*!
+         * @brief If entry is empty then it mean that current node is root node.
+         */
         optional<path_entry> Entry;
         VertexState State;
         /*!
@@ -65,10 +83,10 @@ namespace Utilities::Pathfinding
             while (v->Entry.has_value())
             {
                 path_entry& entry = v->Entry.value();
-                path.push_front(entry);
+                path.push_front(entry); // Current node is destination. Then: N; N-1 N; N-2 N-1 N; ... ; 0 1 2 ... N-2 N-1 N.
                 v = entry.From.__linking.template as_ptr<vertex_node_type>(this->Index);
             }
-            return TPathType(path.begin(), path.end());
+            return TPathType(path.begin(), path.end()); // list are best way to create a sequence with valid direction without reverse. But best way to store items it is vector.
         }
 
         inline void clear()
@@ -122,8 +140,8 @@ namespace Utilities::Pathfinding
         using vertex_node_type = VertexNode<vertex_type, edge_type>;
         using edge_node_type = EdgeNode<edge_type>;
 
-        std::vector<vertex_node_type> Vertexes;
-        std::vector<edge_node_type> Edges;
+        std::list<vertex_node_type> Vertexes;
+        std::list<edge_node_type> Edges;
 
         GraphNode(graph_type& owner) : linked_node(owner) { init(); }
         GraphNode(graph_type& owner, size_t index) : linked_node(owner, index) { init(); }
@@ -131,11 +149,11 @@ namespace Utilities::Pathfinding
 
         void init()
         {
-            Vertexes.reserve(this->Owner.Vertexes.size());
+            //Vertexes.reserve(this->Owner.Vertexes.size());
             for (auto& v : this->Owner.Vertexes)
                 Vertexes.emplace_back(v, this->Index);
 
-            Edges.reserve(this->Owner.Edges.size());
+            //Edges.reserve(this->Owner.Edges.size());
             for (auto& e : this->Owner.Edges)
                 Edges.emplace_back(e, this->Index);
         }
@@ -148,10 +166,12 @@ namespace Utilities::Pathfinding
 
         inline vertex_node_type& node_of(vertex_type const& v) const
         {
+            //return *reinterpret_cast<vertex_node_type*>(v.__linking.Items.at(this->Index));
             return v.__linking.template as_ref<vertex_node_type>(this->Index);
         }
         inline edge_node_type& node_of(edge_type const& v) const
         {
+            //*reinterpret_cast<edge_node_type*>(v.__linking.Items.at(this->Index));
             return v.__linking.template as_ref<edge_node_type>(this->Index);
         }
     };
@@ -191,28 +211,28 @@ namespace Utilities::Pathfinding
         using vertex_node_type = typename graph_node_type::vertex_node_type;
         using edge_node_type = typename graph_node_type::edge_node_type;
 
-        const graph_type& Graph;
-        graph_node_type GraphNode;
+        graph_type const& Graph;
 
+        graph_node_type GraphNode;
         TCostEvaluator Evaluator;
 
         BFS(graph_type& graph, TCostEvaluator const& evaluator)
             : Graph(graph), GraphNode(graph), Evaluator(evaluator)
-        {}
-        BFS(graph_type& graph) : BFS(graph, TCostEvaluator{}) {}
-        ~BFS() = default;
-
-        template<typename TPathType = typename vertex_node_type::path_type_default>
-        TPathType operator()(vertex_type const& from, vertex_type const& to)
         {
             for (auto& e : GraphNode.Edges)
             {
                 e.clear();
                 e.Cost = Evaluator(GraphNode, e);
             }
+        }
+        BFS(graph_type& graph) : BFS(graph, TCostEvaluator{}) {}
+        ~BFS() = default;
 
-            auto& nodeTo = GraphNode.node_of(to);
-            auto& nodeFrom = GraphNode.node_of(from);
+        template<typename TPathType = typename vertex_node_type::path_type_default>
+        TPathType operator()(vertex_type const& from, vertex_type const& to)
+        {
+            vertex_node_type& nodeTo = GraphNode.node_of(to);
+            vertex_node_type& nodeFrom = GraphNode.node_of(from);
             nodeFrom.State = VertexState::Explored;
             nodeFrom.Cost = 0;
 
