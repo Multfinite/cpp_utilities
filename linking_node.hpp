@@ -17,7 +17,7 @@ namespace Utilities
         size_t next_index() const { return Items.size(); }
         size_t free_index() const
         {
-            for (size_t i = 0; i < Items.size(); i++)
+            for (size_t i = 0; i <= Items.size(); i++)
             {
                 if (!Items[i])
                     return i;
@@ -26,14 +26,14 @@ namespace Utilities
         }
         void set(size_t index, linked_type::value_type ptr)
         {
-            while (index >= Items.size())
+            while (Items.size() <= index)
                 Items.push_back(nullptr);
             Items[index] = ptr;
             ValidCount++;
         }
         void reset(size_t index)
         {
-            while (index >= Items.size())
+            while (Items.size() <= index)
                 Items.push_back(nullptr);
             Items[index] = nullptr;
             ValidCount--;
