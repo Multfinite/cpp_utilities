@@ -178,7 +178,7 @@ namespace Utilities
         template<typename ...TArgs>
         EdgeBidirectional(vertex_type& from, vertex_type& to, TArgs&& ...args) :
             From(from), To(to), Context(args...)
-        { link(); }
+          { link(); }
         ~EdgeBidirectional() { unlink(); }
     private:
         inline void link()
