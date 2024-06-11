@@ -7,12 +7,18 @@
 #include <list>
 #include <vector>
 
+#define VERBOSE_PF 1
+
+#if VERBOSE_PF == 1
+#include <iostream>
+#endif
+
 namespace Utilities::Pathfinding
 {
     /*!
      * @brief Don't put nodes to a containers to mark them as being in some stte. Use this enum instead which valua attached to node itself
      */
-    enum struct VertexState : unsigned char
+    enum struct ProcessingState : unsigned char
     {
         /*!
           * @brief Vertex did not appear yet.
@@ -65,7 +71,7 @@ namespace Utilities::Pathfinding
          * @brief If entry is empty then it mean that current node is root node.
          */
         optional<path_entry> Entry;
-        VertexState State;
+        ProcessingState State;
         /*!
          * @brief Total cost from root to this
          */
@@ -92,7 +98,7 @@ namespace Utilities::Pathfinding
         inline void clear()
         {
             Entry = nullopt;
-            State = VertexState::Unhandled;
+            State = ProcessingState::Unhandled;
             Cost = nullopt;
         }
 
@@ -166,13 +172,41 @@ namespace Utilities::Pathfinding
 
         inline vertex_node_type& node_of(vertex_type const& v) const
         {
-            //return *reinterpret_cast<vertex_node_type*>(v.__linking.Items.at(this->Index));
             return v.__linking.template as_ref<vertex_node_type>(this->Index);
+        }
+        inline std::vector<std::reference_wrapper<vertex_node_type>> nodes_of(vertex_type const& v...) const
+        {
+            std::vector<std::reference_wrapper<vertex_node_type>> nodes; nodes.reserve(sizeof(v));
+            for(auto const& i : v)
+                nodes.push_back(i.__linking.template as_ref<vertex_node_type>(this->Index));
+            return nodes;
+        }
+        template<typename InputIt>
+        inline std::vector<std::reference_wrapper<vertex_node_type>> nodes_of(InputIt b, InputIt e) const
+        {
+            std::vector<std::reference_wrapper<vertex_node_type>> nodes; nodes.reserve(e - b);
+            for(; b != e; b++)
+                nodes.push_back(b->__linking.template as_ref<vertex_node_type>(this->Index));
+            return nodes;
         }
         inline edge_node_type& node_of(edge_type const& v) const
         {
-            //*reinterpret_cast<edge_node_type*>(v.__linking.Items.at(this->Index));
             return v.__linking.template as_ref<edge_node_type>(this->Index);
+        }
+        inline std::vector<std::reference_wrapper<edge_node_type>> nodes_of(edge_type const& v...) const
+        {
+            std::vector<std::reference_wrapper<edge_node_type>> nodes; nodes.reserve(sizeof(v));
+            for(auto const& i : v)
+                nodes.push_back(i.__linking.template as_ref<edge_node_type>(this->Index));
+            return nodes;
+        }
+        template<typename InputIt>
+        inline std::vector<std::reference_wrapper<edge_node_type>> nodes_of(InputIt b, InputIt e) const
+        {
+            std::vector<std::reference_wrapper<edge_node_type>> nodes; nodes.reserve(e - b);
+            for(; b != e; b++)
+                nodes.push_back(b->__linking.template as_ref<edge_node_type>(this->Index));
+            return nodes;
         }
     };
 
@@ -231,34 +265,41 @@ namespace Utilities::Pathfinding
         template<typename TPathType = typename vertex_node_type::path_type_default>
         TPathType operator()(vertex_type const& from, vertex_type const& to)
         {
+#if VERBOSE_PF == 1
+             std::cout << "FROM:        " << std::hex << &to << std::dec << std::endl;
+             std::cout << "TO:      " << std::hex << &from << std::dec << std::endl;
+#endif
             vertex_node_type& nodeTo = GraphNode.node_of(to);
             vertex_node_type& nodeFrom = GraphNode.node_of(from);
-            nodeFrom.State = VertexState::Explored;
+            nodeFrom.State = ProcessingState::Explored;
             nodeFrom.Cost = 0;
 
-            std::list<vertex_node_type*> reachable;
-            reachable.push_back(&nodeFrom);
+            std::list<vertex_node_type*> reachable; reachable.push_back(&nodeFrom);
             while (!reachable.empty())
             {
                 vertex_node_type& nodeCurrent = *reachable.front(); reachable.pop_front();
                 vertex_type const& current = nodeCurrent.Owner;
-                if (&nodeCurrent == &nodeTo)
-                    return nodeCurrent.template Build<TPathType>();
+                std::cout << std::hex << &current << std::dec << "  " << (int) nodeCurrent.State << " = " << nodeCurrent.Cost.value_or(-1) << std::endl;
 
                 reachable.remove(&nodeCurrent);
-                nodeCurrent.State = VertexState::Explored;
+                nodeCurrent.State = ProcessingState::Explored;
 
                 for (void* pEdge : current.OutcomingEdges)
                 {
                     auto const& edge = reference_cast<edge_type>((edge_ptr) pEdge);
                     auto& nodeEdge = GraphNode.node_of(edge);
-                    auto const& adjacent = edge.To;
+                    auto const& adjacent = edge_type::Bidirectional && &edge.To == &current ? edge.From : edge.To;
                     auto& nodeAdjacent = GraphNode.node_of(adjacent);
-
-                    if (nodeAdjacent.State == VertexState::Unhandled)
+#if VERBOSE_PF == 1
+                    std::cout << "  " << std::hex << &adjacent << " <-- " << &edge << std::dec << std::endl;
+#endif
+                    if (nodeAdjacent.State == ProcessingState::Unhandled)
                     {
-                        nodeAdjacent.State = VertexState::Queued;
+                        nodeAdjacent.State = ProcessingState::Queued;
                         reachable.push_back(&nodeAdjacent);
+#if VERBOSE_PF == 1
+                        std::cout << "      queued" << std::endl;
+#endif
                     }
                     const bool isCostPresent = nodeAdjacent.Cost.has_value();
                     const cost_type fullCost = nodeCurrent.Cost.value() + nodeEdge.Cost.value();
@@ -266,12 +307,18 @@ namespace Utilities::Pathfinding
                     {
                         nodeAdjacent.Entry.emplace(current, edge);
                         nodeAdjacent.Cost = fullCost;
+#if VERBOSE_PF == 1
+                        std::cout << "      ";
+                        if(isCostPresent) std::cout << "(better) ";
+                        std::cout << "cost is " << fullCost << " via " << std::hex << &current << ":" << &edge << std::dec << std::endl;
+#endif
                     }
                 }
             }
-            return TPathType{};
+             return nodeTo.template Build<TPathType>();
         }
     };
 }
 
+#undef VERBOSE_PF
 #endif // UTILITIES_PATHFINDING_HPP
