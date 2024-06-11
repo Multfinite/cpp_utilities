@@ -212,8 +212,8 @@ namespace Utilities
         using vertex_data_type = typename vertex_type::data_type;
         using edge_type = TEdge;
         using edge_data_type = typename edge_type::data_type;
-        using vertexes_type = std::vector<vertex_type>;
-        using edges_type = std::vector<edge_type>;
+        using vertexes_type = std::list<vertex_type>;
+        using edges_type = std::list<edge_type>;
 
         __linking_node __linking;
 
