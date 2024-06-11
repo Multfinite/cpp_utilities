@@ -31,8 +31,9 @@ namespace Utilities
     concept IsEdgeCachedVertex =
         std::ranges::range<typename T::edges_type> &&
         std::ranges::range<typename T::vertexes_type> &&
-       IsVertex<T> && requires(T x)
+       IsVertex<T> && requires(T x, bool b)
     {
+        b = T::Bidirectional;
         typename T::edges_type;
         typename T::vertexes_type;
         x.Edges; x.IncomingEdges; x.OutcomingEdges;
@@ -118,6 +119,8 @@ namespace Utilities
 #endif
     struct Edge
     {
+        static constexpr bool Bidirectional = false;
+
         using data_type = TData;
         using vertex_type = TVertex;
 
@@ -163,6 +166,8 @@ namespace Utilities
 #endif
     struct EdgeBidirectional
     {
+        static constexpr bool Bidirectional = true;
+
         using data_type = TData;
         using vertex_type = TVertex;
 
