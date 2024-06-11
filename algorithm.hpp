@@ -69,7 +69,7 @@ namespace Utilities
             while(cb != ce)
             {
                 if(pred(*cb)) break;
-                ++cb; ++ lb;
+                ++cb; ++lb;
             }
             return lb;
         }
@@ -107,6 +107,12 @@ namespace Utilities
         {
                 auto iterator = std::find_if(container.begin(), container.end(), pred);
                 return iterator != container.end();
+        }
+
+        template<typename TDestinationContainer, typename TContainer>
+        void assign(TDestinationContainer& dst, const TContainer& other)
+        {
+            dst.assign(other.cbegin(), other.cend());
         }
 
         /*!
