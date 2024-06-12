@@ -74,7 +74,7 @@ namespace Utilities::Pathfinding
         using path_entry = PathEntry<vertex_type, edge_type, cost_type>;
         using path_type_default = std::vector<std::reference_wrapper<path_entry>>;
 
-        // create and std::set here and store ALL variants
+        // create and std::set here and store ALL variants - [root vertex, it'is path entry]
         // also, it is cache for single root. Need to make storing for any count of roots.
         /*!
          * @brief If entry is empty then it mean that current node is root node.
@@ -303,18 +303,12 @@ namespace Utilities::Pathfinding
             cout
                     << "   " << __FUNCTION__ << endl
                     << hex << "   " << &f << " (" << &fNode << ")" << dec << "  "
-                    << hex << "   " << &t << " (" << &tNode << ")" << dec << "  ";
+                    << hex << "   " << &t << " (" << &tNode << ")" << dec << "  "
+                    << endl;
 #endif
-            if(!fNode.Entry.has_value())
-            {
-#if VERBOSE_PF == 1
-                cout << "       -- no entry, root pf node." << endl;
-#endif
-                return;
-            }
-            cout << endl;
 
-            const cost_type fullCost = fNode.Entry.value().Cost + edgeNode.Cost.value();
+            const cost_type fNodeCost = fNode.Entry.has_value() ? fNode.Entry.value().Cost : 0;
+            const cost_type fullCost =  + edgeNode.Cost.value();
             if (!tNode.Entry.has_value())
                 tNode.Entry.emplace(f, edge, fullCost);
             else if (fullCost < tNode.Entry.value().Cost)
@@ -356,7 +350,7 @@ namespace Utilities::Pathfinding
                 {
                     enqueue(ways, t); enqueue(ways, f);
                     check(edge, edgeNode, f, fNode, t, tNode);
-                    check(edge, edgeNode, t, tNode, f, fNode);
+                    if(&f != &from) check(edge, edgeNode, t, tNode, f, fNode);
                 }
                 else
                 {
