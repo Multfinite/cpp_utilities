@@ -20,4 +20,6 @@ namespace Utilities::Math
     };
 }
 
+#define VECTOR2_EXPAND(v) v.X, v.Y
+
 #endif // UTILITIES_MATH_HPP
