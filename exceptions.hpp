@@ -73,6 +73,11 @@ namespace Exceptions
                 parse_error(const std::string& function, const std::string& file, int line) : base_error("Parsing failed.", function, file, line) { }
                 parse_error(const std::string& msg, const std::string& function, const std::string& file, int line) : base_error(msg, function, file, line) { }
         };
+        struct invalid_state_error : public base_error
+        {
+                invalid_state_error(const std::string& function, const std::string& file, int line) : base_error("Invalid state.", function, file, line) { }
+                invalid_state_error(const std::string& msg, const std::string& function, const std::string& file, int line) : base_error(msg, function, file, line) { }
+        };
 }
 
 #define construct_error(type, msg) type { msg, __FUNCTION__, __FILE__, __LINE__ }
