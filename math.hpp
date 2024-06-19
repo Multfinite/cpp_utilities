@@ -12,8 +12,13 @@ namespace Utilities::Math
         using vector_type = Vector2<value_type>;
 
         static constexpr vector_type Zero = vector_type { 0, 0 };
+        static constexpr vector_type Identity = vector_type { 1, 1 };
 
         value_type X, Y;
+
+        Vector2() = default;
+        Vector2(TNumeric v) : X(v), Y(v) {}
+        Vector2(TNumeric x, TNumeric y) : X(x), Y(y) {}
 
         vector_type operator+(vector_type const& other) const { return vector_type { X + other.X, Y + other.Y }; };
         vector_type operator-(vector_type const& other) const { return vector_type { X - other.X, Y - other.Y }; };
