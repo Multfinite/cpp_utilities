@@ -11,8 +11,8 @@ namespace Utilities::Math
         using value_type = TNumeric;
         using vector_type = Vector2<value_type>;
 
-        inline static vector_type Zero() { return vector_type { 0, 0 } };
-        inline static vector_type Identity() { return vector_type { 1, 1 } };
+        inline static vector_type Zero() { return vector_type { 0, 0 }; };
+        inline static vector_type Identity() { return vector_type { 1, 1 }; };
 
         value_type X, Y;
 
