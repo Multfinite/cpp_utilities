@@ -65,4 +65,26 @@ inline void clear(const T& ...args)
 		x.clear();
 }
 
+#define GETTER_NAME(name) get_##name
+#define SETTER_NAME(name) set_##name
+
+#define GETTER_DECL(name, type) type GETTER_NAME(name)()
+#define SETTER_DECL(name, type) void SETTER_NAME(name)(type value)
+
+#define GETTER_V(name, field) std::remove_reference_t<decltype(field)> GETTER_NAME(name)()
+#define GETTER_R(name, field) std::remove_reference_t<decltype(field)>& GETTER_NAME(name)()
+#define GETTER_RC(name, field) std::remove_reference_t<decltype(field)> const& GETTER_NAME(name)()
+
+#define SETTER_V(name, field) void SETTER_NAME(name)(std::remove_reference_t<decltype(field)> value)
+#define SETTER_R(name, field) void SETTER_NAME(name)(std::remove_reference_t<decltype(field)>& value)
+#define SETTER_RC(name, field) void SETTER_NAME(name)(std::remove_reference_t<decltype(field)> const& value)
+
+#define GETTER_V_DEFAULT(name, field) GETTER_V(name, field) const { return field; }
+#define GETTER_R_DEFAULT(name, field) GETTER_R(name, field) const { return field; }
+#define GETTER_RC_DEFAULT(name, field) GETTER_RC(name, field) const { return field; }
+
+#define SETTER_V_DEFAULT(name, field) SETTER_V(name, field) { field = value; }
+#define SETTER_R_DEFAULT(name, field) SETTER_R(name, field) { field = value; }
+#define SETTER_RC_DEFAULT(name, field) SETTER_RC(name, field) { field = value; }
+
 #endif //UTILITIES_MACRO_HPP
