@@ -18,7 +18,7 @@ namespace Utilities
         using vector_type = TVector;
 
         SpaceNode* _parent = nullptr;
-        std::list<std::reference_wrapper<SpaceNode>> _chlidrens;
+        std::list<std::reference_wrapper<node>> _chlidrens;
         vector_type _position, _globalPosition;
 
     public:
@@ -45,7 +45,7 @@ namespace Utilities
         GETTER_V_DEFAULT(parent, _parent)
         SETTER_V(parent, _parent)
         {
-            if(_parent) _parent->_chlidrens.remove(*this);
+            if(_parent) _parent->_chlidrens.remove_if([this](auto const& x) { return &x.get() == this; });
             _parent = value;
             if(_parent) _parent->_chlidrens.push_back(*this);
             set_position(_position);
