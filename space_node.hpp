@@ -29,8 +29,7 @@ namespace Utilities
         {
             _globalPosition = value;
             _position = _globalPosition - (_parent ? _parent->_globalPosition : vector_type{});
-            for(node& chlid : _chlidrens)
-                chlid._globalPosition = chlid._position + _globalPosition;
+            for(node& chlid : _chlidrens) chlid.set_position(chlid._position);
         }
 
         GETTER_V_DEFAULT(position, _position)
@@ -38,8 +37,7 @@ namespace Utilities
         {
             _position = value;
             _globalPosition = _position + (_parent ? _parent->_globalPosition : vector_type{});
-            for(node& chlid : _chlidrens)
-                chlid._globalPosition = chlid._position + _globalPosition;
+            for(node& chlid : _chlidrens) chlid.set_position(chlid._position);
         }
 
         GETTER_V_DEFAULT(parent, _parent)
