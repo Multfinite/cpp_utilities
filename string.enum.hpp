@@ -19,7 +19,7 @@ namespace Utilities::Enum
             std::map<std::string, T> m = GetMap<T>();
             return m.at(Utilities::string_tolower(s));
         } catch (...) {
-            throw construct_error(Exceptions::base_error, "from_string<T = " + std::string(typeid(T).name()) + "> invalid string value v");
+            throw construct_error(Exceptions::base_error, "from_string<T = " + std::string(typeid(T).name()) + "> invalid string value v = { " + s + " }");
         }
     }
 
@@ -34,7 +34,7 @@ namespace Utilities::Enum
          if(iter != m.end())
              return iter->first;
 
-         throw construct_error(Exceptions::base_error, "to_string<T = " + std::string(typeid(T).name()) + "> invalid value of enum v");
+         throw construct_error(Exceptions::base_error, "to_string<T = " + std::string(typeid(T).name()) + "> invalid value of enum v = { " + std::to_string(static_cast<std::underlying_type_t<T>>(v)) + " }");
     }
 }
 
