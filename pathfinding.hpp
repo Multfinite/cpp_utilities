@@ -108,7 +108,7 @@ namespace Utilities::Pathfinding
 
     template<typename TEdge, typename TCostType = double>
 #if HAS_CONCEPTS
-        requires IsVertex<TVertex> && IsEdge<TEdge> && IsNumericType<TCostType>
+        requires IsEdge<TEdge> && IsNumericType<TCostType>
 #endif
     struct EdgeNode : public __linked_node<TEdge>
     {
@@ -224,9 +224,6 @@ namespace Utilities::Pathfinding
     };
 
     template<typename TGraphNode>
-#if HAS_CONCEPTS
-        requires IsVertex<TVertex>&& IsNumericType<TCostType>
-#endif
     struct DefaultCostEvaluator
     {
         using graph_node_type = TGraphNode;
