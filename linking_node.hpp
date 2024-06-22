@@ -54,7 +54,7 @@ namespace Utilities
 #if HAS_CONCEPTS
     template<typename T>
     concept HasLinkingNode =
-        std::is_same<__linking_node, decltype(T::__linking)>::value&&
+        std::is_same<__linking_node, decltype(T::__linking)>::value &&
         requires(T x)
     {
         x.__linking;
@@ -63,7 +63,7 @@ namespace Utilities
 
     template<typename TLinkable>
 #if HAS_CONCEPTS
-        requires HasLinkingNode<T>
+        requires HasLinkingNode<TLinkable>
 #endif
     struct __linked_node
     {
