@@ -57,7 +57,7 @@ concept Clearable = requires(T x) { x.clear(); };
 
 template<typename ...T>
 #if  CPP_SINCE(__cplusplus, CPP20)
-	requires Clearable<T>
+        requires (Clearable<T> && ...)
 #endif
 inline void clear(const T& ...args)
 {
