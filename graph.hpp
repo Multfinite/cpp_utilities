@@ -17,13 +17,10 @@ namespace Utilities
     template<typename T>
     concept IsVertex =
         HasLinkingNode<T> &&
-        //std::is_same<decltype(T::__linked), typename T::linked_type>::value &&
-        requires(T x)
+        requires(T& x)
     {
         typename T::data_type;
-        typename T::linked_type;
         x.Context;
-        std::is_same<decltype(x.__linked), typename T::linked_type>::value;
         x.clear();
     };
 
@@ -31,9 +28,8 @@ namespace Utilities
     concept IsEdgeCachedVertex =
         std::ranges::range<typename T::edges_type> &&
         std::ranges::range<typename T::vertexes_type> &&
-       IsVertex<T> && requires(T x, bool b)
+       IsVertex<T> && requires(T& x)
     {
-        b = T::Bidirectional;
         typename T::edges_type;
         typename T::vertexes_type;
         x.Edges; x.IncomingEdges; x.OutcomingEdges;
@@ -44,17 +40,16 @@ namespace Utilities
     concept IsEdge = IsVertex<typename T::vertex_type> &&
         HasLinkingNode<T> &&
         //std::is_same<decltype(T::__linked), typename T::linked_type>::value &&
-        requires(T x, const typename T::vertex_type& v_, const typename T::data_type& d_)
+        requires(T& x, typename T::vertex_type& v, const typename T::data_type& d, bool b)
     {
+        b = T::Bidirectional;
         typename T::data_type;
         typename T::vertex_type;
-        typename T::linked_type;
         x.Context;
-        std::is_same<decltype(x.__linked), typename T::linked_type>::value;
         x.To;
         x.From;
-        x = T(v_, v_);
-        x = T(v_, v_, d_);
+        //x = T(v, v);
+        //x = T(v, v, d);
     };
 
     template<typename T>
@@ -65,11 +60,11 @@ namespace Utilities
         HasLinkingNode<T> &&
         IsVertex<typename T::vertex_type> &&
         IsEdge<typename T::edge_type> &&
-        requires(T x)
+        requires(T& x)
     {
-        x.NodeVertexes;
-        x.NodeEdges;
-        x.NodeGraph;
+        x.Context;
+        x.Vertexes;
+        x.Edges;
     };
 
     template<typename T>
