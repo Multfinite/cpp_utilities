@@ -116,6 +116,28 @@ namespace Utilities::JSON
 		if (v.has_value())
 			j[p] = v.value();
 	}
+
+        inline nlohmann::json json_message(std::string const& msg)
+        {
+            return nlohmann::json { { "message", msg } };
+        }
+
+        template<typename T>
+        inline nlohmann::json json_message(std::string const& msg, T&& context)
+        {
+            return nlohmann::json { { "message", msg }, { "context", context } };
+        }
+
+        template<typename ...T>
+        inline nlohmann::json json_message(std::string const& msg, T&& ...context)
+        {
+            auto ctx = nlohmann::json::array();
+            ([&]
+            {
+                ctx.push_back(context);
+            }, ...);
+            return nlohmann::json { { "message", msg }, { "context", ctx } };
+        }
 }
 
 #define validate_json_object_(item, requiredKeys) Utilities::validate_json_object(__FUNCTION__, __FILE__, __LINE__, item, requiredKeys)
