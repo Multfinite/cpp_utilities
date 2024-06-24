@@ -117,19 +117,19 @@ namespace Utilities::JSON
 			j[p] = v.value();
 	}
 
-        inline nlohmann::json json_message(std::string const& msg)
+        inline nlohmann::json message(std::string const& msg)
         {
             return nlohmann::json { { "message", msg } };
         }
 
         template<typename T>
-        inline nlohmann::json json_message(std::string const& msg, T&& context)
+        inline nlohmann::json message(std::string const& msg, T&& context)
         {
             return nlohmann::json { { "message", msg }, { "context", context } };
         }
 
         template<typename ...T>
-        inline nlohmann::json json_message(std::string const& msg, T&& ...context)
+        inline nlohmann::json message(std::string const& msg, T&& ...context)
         {
             auto ctx = nlohmann::json::array();
             ([&]
