@@ -25,7 +25,7 @@ namespace Utilities
 			spdlog::set_level(spdlog::level::trace);	
 			spdlog::set_default_logger(console);
 		}
-	
+#if ENABLE_NLOHMANN_JSON == 1
                 inline void trace(json const& msg)
 		{
                         spdlog::trace(msg.dump());
@@ -50,6 +50,7 @@ namespace Utilities
 		{
                         spdlog::critical(msg.dump());
 		}
+#endif
 	};
 }
 
