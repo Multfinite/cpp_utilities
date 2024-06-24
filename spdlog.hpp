@@ -12,6 +12,8 @@ namespace Utilities
 	class spdloglib
 	{
 	public:
+             std::shared_ptr<spdloglib> Instance;
+             std::shared_ptr<spdloglib>& Initialize() { return Instance = std::make_shared<spdloglib>(); }
 	private:
 	public:
 		spdloglib()
@@ -24,35 +26,29 @@ namespace Utilities
 			spdlog::set_default_logger(console);
 		}
 	
-		inline void trace(json& msg)
+                inline void trace(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::trace( txt);
+                        spdlog::trace(msg.dump());
 		}
-		inline void debug(json& msg)
+                inline void debug(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::debug(txt);
+                        spdlog::debug(msg.dump());
 		}
-		inline void info(json& msg)
+                inline void info(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::info(txt);
+                        spdlog::info(msg.dump());
 		}
-		inline void warn(json& msg)
+                inline void warn(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::warn(txt);
+                        spdlog::warn(msg.dump());
 		}
-		inline void error(json& msg)
+                inline void error(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::error(txt);
+                        spdlog::error(msg.dump());
 		}
-		inline void critical(json& msg)
+                inline void critical(json const& msg)
 		{
-			auto txt = msg.dump();
-			spdlog::critical(txt);
+                        spdlog::critical(msg.dump());
 		}
 	};
 }
