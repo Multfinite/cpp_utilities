@@ -11,10 +11,20 @@
 #include "string.hpp"
 #include "exceptions.hpp"
 
+#include <cassert>
+
 namespace Utilities::SQL
 {
         inline std::string as_sql(const nlohmann::json& v) { return "'" + v.dump() + "'::json"; };
 }
+
+#define JSON_DUMP_COMPACT -1, ' '
+#define JSON_DUMP_READABLE 1, '\t'
+#if NDEBUG
+#define JSON_DUMP_DEFAULT JSON_DUMP_COMPACT
+#else
+#define JSON_DUMP_DEFAULT JSON_DUMP_READABLE
+#endif
 
 namespace Utilities::JSON
 {    
