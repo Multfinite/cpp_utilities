@@ -12,8 +12,8 @@ namespace Utilities
 	class spdloglib
 	{
 	public:
-             std::shared_ptr<spdloglib> Instance;
-             std::shared_ptr<spdloglib>& Initialize() { return Instance = std::make_shared<spdloglib>(); }
+             inline static std::shared_ptr<spdloglib> Instance;
+             inline static std::shared_ptr<spdloglib>& Initialize() { return Instance = std::make_shared<spdloglib>(); }
 	private:
 	public:
 		spdloglib()
