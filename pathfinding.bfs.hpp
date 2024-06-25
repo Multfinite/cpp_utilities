@@ -39,7 +39,7 @@ namespace Utilities::Pathfinding
         graph_node_type GraphNode;
         TCostEvaluator Evaluator;
 
-        BFS(graph_type& graph, TCostEvaluator const& evaluator)
+        BFS(graph_type& graph, TCostEvaluator&& evaluator)
             : Graph(graph), GraphNode(graph), Evaluator(evaluator)
         {
             for (auto& e : GraphNode.Edges)
@@ -80,7 +80,7 @@ namespace Utilities::Pathfinding
 #endif
 
             const cost_type fNodeCost = fNode.Entry.has_value() ? fNode.Entry.value().Cost : 0;
-            const cost_type fullCost =  + edgeNode.Cost.value();
+            const cost_type fullCost = fNodeCost + edgeNode.Cost.value();
             if (!tNode.Entry.has_value())
                 tNode.Entry.emplace(f, edge, fullCost);
             else if (fullCost < tNode.Entry.value().Cost)
