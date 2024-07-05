@@ -87,6 +87,10 @@ namespace Utilities::Pathfinding
         {
             std::list<std::reference_wrapper<path_entry>> path;
             vertex_node_type* v = const_cast<vertex_node_type*>(this);
+            /*
+             * NOTE: there are no protection against call with the same vertex in pathfinding (like `operator()(v, v)`)
+             * as result it will cause endless cycle with memory allocation!
+            */
             while (v->Entry.has_value())
             {
                 path_entry& entry = v->Entry.value();
