@@ -24,6 +24,35 @@ namespace Utilities
         }
 
         template<typename TContainer>
+        auto indexof(const TContainer& container, const typename TContainer::value_type& _Val) ->
+                decltype(container.begin(), container.end())
+        {
+                size_t index = 0;
+                for(auto it = container.cbegin()
+                    ; it != container.cend()
+                    ; ++it, ++index)
+                {
+                    if(*it == _Val)
+                        return index;
+                }
+                throw construct_error_no_msg(Exceptions::item_not_found_exception);
+        }
+        template<typename TContainer, typename TPredicate>
+        auto indexof_if(const TContainer& container, const TPredicate& pred, bool raise = true) ->
+                decltype(container.begin(), container.end())
+        {
+                size_t index = 0;
+                for(auto it = container.cbegin()
+                    ; it != container.cend()
+                    ; ++it, ++index)
+                {
+                    if(pred(*it))
+                        return index;
+                }
+                throw construct_error_no_msg(Exceptions::item_not_found_exception);
+        }
+
+        template<typename TContainer>
         auto find(const TContainer& container, const typename TContainer::value_type& _Val, bool raise = true) ->
                 decltype(container.begin(), container.end())
         {
