@@ -13,6 +13,8 @@ namespace Utilities::Math
 
         inline static vector_type Zero() { return vector_type { 0, 0 }; };
         inline static vector_type Identity() { return vector_type { 1, 1 }; };
+        inline static vector_type XAxis() { return vector_type { 1, 0 }; };
+        inline static vector_type XAxis() { return vector_type { 0, 1 }; };
 
         value_type X, Y;
 
