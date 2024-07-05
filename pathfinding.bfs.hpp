@@ -132,8 +132,10 @@ namespace Utilities::Pathfinding
 
                 edgeNode.State = ProcessingState::Explored;
             }
-             return toNode.template Build<TPathType>();
-        }
+            if(&from == &to)
+                toNode.Entry = nullopt;
+            return toNode.template Build<TPathType>();
+        }        
     };
 }
 
