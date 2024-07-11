@@ -39,6 +39,50 @@ namespace Utilities::Math
         template<typename TValueTypeFrom>
         inline static vector_type static_cast_from(Vector2<TValueTypeFrom> const& v) { return vector_type { static_cast<value_type>(v.X), static_cast<value_type>(v.Y) }; }
     };
+
+    /*
+     * @brief SAT implementation in 1-dimensional space for lines.
+     * @brief it also can be used as basic check for 1+ dimensional spaces.
+     */
+    template<typename TNumeric>
+    inline bool collides(
+            TNumeric begin0, TNumeric end0
+          , TNumeric begin1, TNumeric end1
+          , TNumeric& beginOut, TNumeric& endOut
+    ) {
+        // some rules:
+        // 1. line 0 must be 'higher' than line 1
+        // 2. begin 'point' must be lower than end 'point'
+
+        if(begin0 < begin1)
+        {
+            std::swap(begin0, begin1);
+            std::swap(end0, end1);
+        }
+        if(begin0 > end0)
+            std::swap(begin0, end0);
+        if(begin1 > end1)
+            std::swap(begin1, end1);
+
+        auto len0 = end0 - begin0;
+        auto len1 = end1 - begin1;
+
+        if(!len0 || !len1)
+            return false; // no intersection if at least one line is point.
+
+        // in generally we have 4 separating 'axises' (it consist of begin and end of both lines)
+        // but we gurantee that line0 begin always higher
+        // so it means that we can check only points of line1 because it always will be included (or be part of) in line0 at intersection
+        // and moreover we can check only beginning of line1 to be inside line0 (it it is not than line0 is outside).
+
+        auto collides = end0 >= begin1;
+        if(collides)
+        {
+            beginOut = begin1;
+            endOut = std::min(end0, end1);
+        }
+        return collides;
+    }
 }
 
 #define VECTOR2_EXPAND(v) (v).X, (v).Y
