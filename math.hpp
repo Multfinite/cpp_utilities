@@ -65,12 +65,6 @@ namespace Utilities::Math
             std::swap(end0, end1);
         }
 
-        auto len0 = end0 - begin0;
-        auto len1 = end1 - begin1;
-
-        if(!len0 || !len1)
-            return false; // no intersection if at least one line is point.
-
         // in generally we have 4 separating 'axises' (it consist of begin and end of both lines)
         // but we gurantee that line0 end always higher
         // so it means that we can check only points of line1 because it always will be included (or be part of) in line0 at intersection
