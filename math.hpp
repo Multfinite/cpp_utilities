@@ -54,15 +54,16 @@ namespace Utilities::Math
         // 1. line 0 must be 'higher' than line 1
         // 2. begin 'point' must be lower than end 'point'
 
-        if(begin0 < begin1)
-        {
-            std::swap(begin0, begin1);
-            std::swap(end0, end1);
-        }
         if(begin0 > end0)
             std::swap(begin0, end0);
         if(begin1 > end1)
             std::swap(begin1, end1);
+
+        if(end0 < end1)
+        {
+            std::swap(begin0, begin1);
+            std::swap(end0, end1);
+        }
 
         auto len0 = end0 - begin0;
         auto len1 = end1 - begin1;
@@ -71,15 +72,15 @@ namespace Utilities::Math
             return false; // no intersection if at least one line is point.
 
         // in generally we have 4 separating 'axises' (it consist of begin and end of both lines)
-        // but we gurantee that line0 begin always higher
+        // but we gurantee that line0 end always higher
         // so it means that we can check only points of line1 because it always will be included (or be part of) in line0 at intersection
-        // and moreover we can check only beginning of line1 to be inside line0 (it it is not than line0 is outside).
+        // and moreover we can check only end of line1 to be inside line0 (because it can be inside ot outside lower-only).
 
-        auto collides = end0 >= begin1;
+        auto collides = /*end1 <= end0 && */end1 >= begin0;
         if(collides)
         {
-            beginOut = begin1;
-            endOut = std::min(end0, end1);
+            endOut = end1;
+            beginOut = std::min(begin0, begin1);
         }
         return collides;
     }
