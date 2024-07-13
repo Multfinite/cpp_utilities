@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <type_traits>
+#include <initializer_list>
 
 template<typename T>
 inline T& reference_cast(T* ptr)
@@ -66,23 +67,21 @@ inline void clear(const T& ...args)
 		x.clear();
 }
 
-template<typename T, typename ...Ts>
-inline bool is_any_of(T&& value, Ts&& ...variants)
+template<typename T>
+inline bool is_any_of(T const& value, std::initializer_list<T>&& variants)
 {
-    ([&]{
-        if(value == variants)
-            return true;
-    }(), ...);
+    for(T& variant : variants)
+        if(variant == value)
+            return  true;
     return false;
 }
 
-template<typename TComparer, typename T, typename ...Ts>
-inline bool is_any_of_if(TComparer&& comp, T&& value, Ts&& ...variants)
+template<typename T, typename TComparer>
+inline bool is_any_of(T const& value, std::initializer_list<T>&& variants, TComparer&& comp)
 {
-    ([&]{
-        if(comp(value, variants))
-            return true;
-    }(), ...);
+    for(T& variant : variants)
+        if(comp(variant, value))
+            return  true;
     return false;
 }
 
