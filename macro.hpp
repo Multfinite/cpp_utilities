@@ -77,7 +77,7 @@ inline bool is_any_of(T const& value, std::initializer_list<T> const& variants)
 }
 
 template<typename T, typename ...Ts>
-inline bool is_any_of(T const& value, Ts&& ...variants)
+inline bool is_any_of(T const& value, Ts const& ...variants)
 {
     ([&]{
         if(value == variants)
@@ -87,7 +87,7 @@ inline bool is_any_of(T const& value, Ts&& ...variants)
 }
 
 template<typename TComparer, typename T, typename ...Ts>
-inline bool is_any_of_if(TComparer const& comp, T const& value, Ts&& ...variants)
+inline bool is_any_of_if(TComparer const& comp, T const& value, Ts const& ...variants)
 {
     ([&]{
         if(comp(value, variants))
