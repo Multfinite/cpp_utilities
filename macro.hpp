@@ -85,6 +85,12 @@ inline bool is_any_of(TComparer&& comp, T& value, Ts&& ...variants)
     return false;
 }
 
+template <typename TIterator, typename T = typename TIterator::value_type>
+inline T* value_of_iterator(TIterator const& x, TIterator const& end)
+{
+    return x == end ? nullptr : *x;
+}
+
 #define GETTER_NAME(name) get_##name
 #define SETTER_NAME(name) set_##name
 
