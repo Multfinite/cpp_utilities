@@ -90,9 +90,9 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
 {
     using T = typename TIterator::value_type;
     if constexpr(std::is_pointer_v<T>)
-         return x == end ? *x : nullptr;
+         return x != end ? *x : nullptr;
     else
-         return x == end ? &*x : nullptr;
+         return x != end ? &*x : nullptr;
 }
 
 #define GETTER_NAME(name) get_##name
