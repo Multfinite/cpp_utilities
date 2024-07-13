@@ -65,6 +65,26 @@ inline void clear(const T& ...args)
 		x.clear();
 }
 
+template<typename T, typename ...Ts>
+inline bool is_any_of(T& value, Ts&& ...variants)
+{
+    ([&]{
+        if(value == variants)
+            return true;
+    }(), ...);
+    return false;
+}
+
+template<typename TComparer, typename T, typename ...Ts>
+inline bool is_any_of(TComparer&& comp, T& value, Ts&& ...variants)
+{
+    ([&]{
+        if(comp(value, variants))
+            return true;
+    }(), ...);
+    return false;
+}
+
 #define GETTER_NAME(name) get_##name
 #define SETTER_NAME(name) set_##name
 
@@ -86,29 +106,5 @@ inline void clear(const T& ...args)
 #define SETTER_V_DEFAULT(name, field) SETTER_V(name, field) { field = value; }
 #define SETTER_R_DEFAULT(name, field) SETTER_R(name, field) { field = value; }
 #define SETTER_RC_DEFAULT(name, field) SETTER_RC(name, field) { field = value; }
-
-#define GETSET_V(name, field) \
-GETTER_V(name, field); \
-SETTER_V(name, field); \
-
-#define GETSET_ABS_V(name, field) \
-virtual GETTER_V(name, field) = 0; \
-virtual SETTER_V(name, field) = 0; \
-
-#define GETSET_R(name, field) \
-GETTER_R(name, field); \
-SETTER_R(name, field); \
-
-#define GETSET_ABS_R(name, field) \
-virtual GETTER_R(name, field) = 0; \
-virtual SETTER_R(name, field) = 0; \
-
-#define GETSET_RC(name, field) \
-GETTER_RC(name, field); \
-SETTER_RC(name, field); \
-
-#define GETSET_ABS_RC(name, field) \
-virtual GETTER_RC(name, field) = 0; \
-virtual SETTER_RC(name, field) = 0; \
 
 #endif //UTILITIES_MACRO_HPP
