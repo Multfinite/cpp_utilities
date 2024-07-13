@@ -17,6 +17,7 @@
 #define CPP_BETWEEN(x, L, H) x < H && x >= L
 
 #include <cstdlib>
+#include <type_traits>
 
 template<typename T>
 inline T& reference_cast(T* ptr)
@@ -76,7 +77,7 @@ inline bool is_any_of(T& value, Ts&& ...variants)
 }
 
 template<typename TComparer, typename T, typename ...Ts>
-inline bool is_any_of(TComparer&& comp, T& value, Ts&& ...variants)
+inline bool is_any_of_if(TComparer&& comp, T& value, Ts&& ...variants)
 {
     ([&]{
         if(comp(value, variants))
@@ -85,10 +86,14 @@ inline bool is_any_of(TComparer&& comp, T& value, Ts&& ...variants)
     return false;
 }
 
-template <typename TIterator, typename T = typename TIterator::value_type>
-inline T* value_of_iterator(TIterator const& x, TIterator const& end)
+template <typename TIterator>
+inline auto value_of_iterator(TIterator const& x, TIterator const& end)
 {
-    return x == end ? nullptr : *x;
+    using T = typename TIterator::value_type;
+    if constexpr(std::is_pointer_v<T>)
+         return x == end ? *x : nullptr;
+    else
+         return x == end ? &*x : nullptr;
 }
 
 #define GETTER_NAME(name) get_##name
