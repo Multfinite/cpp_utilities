@@ -67,7 +67,7 @@ inline void clear(const T& ...args)
 }
 
 template<typename T, typename ...Ts>
-inline bool is_any_of(T& value, Ts&& ...variants)
+inline bool is_any_of(T&& value, Ts&& ...variants)
 {
     ([&]{
         if(value == variants)
@@ -77,7 +77,7 @@ inline bool is_any_of(T& value, Ts&& ...variants)
 }
 
 template<typename TComparer, typename T, typename ...Ts>
-inline bool is_any_of_if(TComparer&& comp, T& value, Ts&& ...variants)
+inline bool is_any_of_if(TComparer&& comp, T&& value, Ts&& ...variants)
 {
     ([&]{
         if(comp(value, variants))
