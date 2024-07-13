@@ -68,7 +68,7 @@ inline void clear(const T& ...args)
 }
 
 template<typename T>
-inline bool is_any_of(T const& value, std::initializer_list<T>&& variants)
+inline bool is_any_of(T const& value, std::initializer_list<T> const& variants)
 {
     for(T const& variant : variants)
         if(variant == value)
@@ -76,8 +76,28 @@ inline bool is_any_of(T const& value, std::initializer_list<T>&& variants)
     return false;
 }
 
+template<typename T, typename ...Ts>
+inline bool is_any_of(T const& value, Ts&& ...variants)
+{
+    ([&]{
+        if(value == variants)
+            return true;
+    }, ...);
+    return false;
+}
+
+template<typename TComparer, typename T, typename ...Ts>
+inline bool is_any_of_if(TComparer const& comp, T const& value, Ts&& ...variants)
+{
+    ([&]{
+        if(comp(value, variants))
+            return true;
+    }, ...);
+    return false;
+}
+
 template<typename T, typename TComparer>
-inline bool is_any_of(T const& value, std::initializer_list<T>&& variants, TComparer&& comp)
+inline bool is_any_of_if(T const& value, std::initializer_list<T> const& variants, TComparer const& comp)
 {
     for(T const& variant : variants)
         if(comp(variant, value))
