@@ -38,6 +38,8 @@ namespace Utilities::Enum
     }
 }
 
+#define enum_map_pair(enum, enum_value) { nameof(enum_value), enum::enum_value }
+
 #if ENABLE_NLOHMANN_JSON == 1
 #define JSON_ENUM_TYPE_CONVERSION(enum_type) \
     void to_json(nlohmann::json& j, const enum_type& v) { j = to_string(v); } \
