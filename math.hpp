@@ -3,8 +3,15 @@
 
 #include <cmath>
 
+#define fraction_inlined(x) (x - std::floor(x))
+
 namespace Utilities::Math
 {
+    template<typename TNumeric>
+    inline TNumeric fraction(TNumeric const& x) {
+        return fraction_inlined(x);
+    }
+
     template<typename TNumeric>
     struct Vector2
     {
