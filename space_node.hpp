@@ -54,6 +54,9 @@ namespace Utilities
 
         auto cbegin() const { return _chlidrens.cbegin(); }
         auto cend() const { return _chlidrens.cend(); }
+
+        virtual SpaceNode() = default;
+        virtual ~SpaceNode() = default;
     };
 }
 
