@@ -124,14 +124,14 @@ namespace Utilities
         }
 
         template<typename TContainer>
-        auto contains_if(const TContainer& container, const typename TContainer::value_type& _Val) ->
+        auto contains(const TContainer& container, const typename TContainer::value_type& _Val) ->
                 decltype(container.begin(), container.end(), bool{})
         {
                 auto iterator = std::find(container.begin(), container.end(), _Val);
                 return iterator != container.end();
         }
         template<typename TContainer, typename TPredicate>
-        auto contains(const TContainer& container, const TPredicate& pred) ->
+        auto contains_if(const TContainer& container, const TPredicate& pred) ->
                 decltype(container.begin(), container.end(), bool{})
         {
                 auto iterator = std::find_if(container.begin(), container.end(), pred);
