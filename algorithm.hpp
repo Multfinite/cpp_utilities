@@ -25,9 +25,9 @@ namespace Utilities
 
         template<typename TContainer>
         auto indexof(const TContainer& container, const typename TContainer::value_type& _Val) ->
-                decltype(container.begin(), container.end())
+                typename TContainer::size_type
         {
-                size_t index = 0;
+                typename TContainer::size_type index = 0;
                 for(auto it = container.cbegin()
                     ; it != container.cend()
                     ; ++it, ++index)
@@ -38,10 +38,9 @@ namespace Utilities
                 throw construct_error_no_msg(Exceptions::item_not_found_exception);
         }
         template<typename TContainer, typename TPredicate>
-        auto indexof_if(const TContainer& container, const TPredicate& pred, bool raise = true) ->
-                decltype(container.begin(), container.end())
+        auto indexof_if(const TContainer& container, const TPredicate& pred, bool raise = true) -> typename TContainer::size_type
         {
-                size_t index = 0;
+                typename TContainer::size_type index = 0;
                 for(auto it = container.cbegin()
                     ; it != container.cend()
                     ; ++it, ++index)
