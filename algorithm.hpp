@@ -124,7 +124,7 @@ namespace Utilities
         }
 
         template<typename TContainer>
-        auto contains(const TContainer& container, const typename TContainer::value_type& _Val) ->
+        auto contains_if(const TContainer& container, const typename TContainer::value_type& _Val) ->
                 decltype(container.begin(), container.end(), bool{})
         {
                 auto iterator = std::find(container.begin(), container.end(), _Val);
