@@ -78,6 +78,11 @@ namespace Exceptions
                 invalid_state_error(const std::string& function, const std::string& file, int line) : base_error("Invalid state.", function, file, line) { }
                 invalid_state_error(const std::string& msg, const std::string& function, const std::string& file, int line) : base_error(msg, function, file, line) { }
         };
+        struct invalid_argument_error : public base_error
+        {
+                invalid_argument_error(const std::string& function, const std::string& file, int line) : base_error("Invalid argument.", function, file, line) { }
+                invalid_argument_error(const std::string& msg, const std::string& function, const std::string& file, int line) : base_error(msg, function, file, line) { }
+        };
         struct impossible_scenario_error : public base_error
         {
                 impossible_scenario_error(const std::string& function, const std::string& file, int line) : base_error("It must never happen.", function, file, line) { }
