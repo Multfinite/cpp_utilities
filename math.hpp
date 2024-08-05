@@ -27,7 +27,7 @@ namespace Utilities::Math
 
         inline vector_type operator+(vector_type const& other) const noexcept { return vector_type { X + other.X, Y + other.Y }; };
         inline vector_type operator-(vector_type const& other) const noexcept { return vector_type { X - other.X, Y - other.Y }; };
-        inline vector_type operator-() const { return vector_type noexcept { -X, -Y }; }
+        inline vector_type operator-() const noexcept { return vector_type { -X, -Y }; }
         inline vector_type operator*(TNumeric scalar) const noexcept { return vector_type { X * scalar, Y * scalar }; };
         inline vector_type operator/(TNumeric scalar) const noexcept { return vector_type { X / scalar, Y / scalar }; };
         inline bool operator==(vector_type const& other) const noexcept { return X == other.X && Y == other.Y; };
