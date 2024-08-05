@@ -129,12 +129,12 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
 #define SETTER_R(name, field) void SETTER_NAME(name)(std::remove_reference_t<decltype(field)>& value)
 #define SETTER_RC(name, field) void SETTER_NAME(name)(std::remove_reference_t<decltype(field)> const& value)
 
-#define GETTER_V_DEFAULT(name, field) GETTER_V(name, field) const { return field; }
-#define GETTER_R_DEFAULT(name, field) GETTER_R(name, field) const { return field; }
-#define GETTER_RC_DEFAULT(name, field) GETTER_RC(name, field) const { return field; }
+#define GETTER_V_DEFAULT(name, field) GETTER_V(name, field) const noexcept { return field; }
+#define GETTER_R_DEFAULT(name, field) GETTER_R(name, field) const noexcept { return field; }
+#define GETTER_RC_DEFAULT(name, field) GETTER_RC(name, field) const noexcept { return field; }
 
-#define SETTER_V_DEFAULT(name, field) SETTER_V(name, field) { field = value; }
-#define SETTER_R_DEFAULT(name, field) SETTER_R(name, field) { field = value; }
-#define SETTER_RC_DEFAULT(name, field) SETTER_RC(name, field) { field = value; }
+#define SETTER_V_DEFAULT(name, field) SETTER_V(name, field) noexcept { field = value; }
+#define SETTER_R_DEFAULT(name, field) SETTER_R(name, field) noexcept { field = value; }
+#define SETTER_RC_DEFAULT(name, field) SETTER_RC(name, field) noexcept { field = value; }
 
 #endif //UTILITIES_MACRO_HPP
