@@ -121,6 +121,9 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
 #define GETTER_DECL(name, type) type GETTER_NAME(name)()
 #define SETTER_DECL(name, type) void SETTER_NAME(name)(type value)
 
+#define GETTER_IMPL(owner, name, type) type owner::GETTER_NAME(name)()
+#define SETTER_IMPL(owner, name, type) void owner::SETTER_NAME(name)(type value)
+
 #define GETTER_V(name, field) std::remove_reference_t<decltype(field)> GETTER_NAME(name)()
 #define GETTER_R(name, field) std::remove_reference_t<decltype(field)>& GETTER_NAME(name)()
 #define GETTER_RC(name, field) std::remove_reference_t<decltype(field)> const& GETTER_NAME(name)()
