@@ -4,21 +4,22 @@
 #include <list>
 #include <functional>
 #include <utility>
+#include <stdexcept>
 
 namespace Utilities
-{
-	template<typename ... TArgs>
+{    
+        template<typename ...TArgs>
 	class Event
 	{
 	public:
-		using CallbackType = std::function<void(TArgs... args)>;
+                using CallbackType = std::function<void(TArgs&& ...args)>;
 	private:
 		std::list<CallbackType> _callbacks;
 	public:
 		Event() = default;
 		~Event() { _callbacks.clear(); }
 
-		void operator()(TArgs... args) const
+                void operator()(TArgs... args) const
 		{
 			for (auto& callback : _callbacks)
 				callback(args...);
@@ -27,20 +28,28 @@ namespace Utilities
 		void operator-=(CallbackType callback) { _callbacks.remove(callback); }
 	};
 
-	template<typename TObject, typename ... TArgs>
+        template<typename TObject, typename ...TArgs>
 	class ObjectEvent
 	{
 	public:
-		using CallbackType = std::function<void(TObject& sender, TArgs... args)>;
+                struct sender_must_be_valid_reference_error : std::runtime_error
+                {
+                    sender_must_be_valid_reference_error() :  std::runtime_error("nullptr was passed.") {}
+                };
+
+                using CallbackType = std::function<void(TObject& sender, TArgs&& ...args)>;
 	private:
-		TObject* _sender;
+                TObject* _sender;
 		std::list<CallbackType> _callbacks;
 	public:
-		ObjectEvent(TObject* sender) :
-			_sender(sender)
-		{ }
-		ObjectEvent(TObject& sender) :
-			_sender(&sender)
+                ObjectEvent(TObject* sender) :
+                        _sender(sender)
+                {
+                    if(!_sender)
+                        throw sender_must_be_valid_reference_error{};
+                }
+                ObjectEvent(TObject& sender) noexcept :
+                        _sender(&sender)
 		{ }
 
 		ObjectEvent(ObjectEvent const& other) noexcept :
@@ -64,14 +73,13 @@ namespace Utilities
 
 		~ObjectEvent() { _callbacks.clear(); }
 
-		void operator()(TArgs... args) const
+                inline void operator()(TArgs&& ...args) const noexcept
 		{
-			TObject& sender = (TObject&) _sender;
-			for (auto& callback : _callbacks)
-				callback(sender, args...);
+                    for (auto& callback : _callbacks)
+                            callback(*_sender, args...);
 		}
-		void operator+=(CallbackType callback) { _callbacks.push_back(callback); }
-		void operator-=(CallbackType callback) { _callbacks.remove(callback); }
+                inline void operator+=(CallbackType callback) noexcept { _callbacks.push_back(callback); }
+                inline void operator-=(CallbackType callback) noexcept { _callbacks.remove(callback); }
 	};
 }
 
