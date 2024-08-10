@@ -18,9 +18,9 @@ namespace Exceptions
 	*/
 	struct base_error : public std::runtime_error
 	{
-		std::string		Function;
-		std::string		File;
-		int					Line;
+                std::string Function;
+                std::string File;
+                int Line;
 	
 		base_error(const std::string& function, const std::string& file, int line) : base_error("An unknown error", function, file, line) {}
 		base_error(const std::string& msg, const std::string& function, const std::string& file, int line) :
@@ -44,7 +44,10 @@ namespace Exceptions
 			block["line"] = Line;
 			block["function"] = Function;
 			block["message"] = msg;
-			block["type"] = typeid(this).name();
+                        block["type"] = json{
+                            { "name", typeid(this).name() }
+                          , { "hash", typeid(this).hash_code() }
+                        };
 	
 			return block;
 		}
