@@ -140,4 +140,7 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
 #define SETTER_R_DEFAULT(name, field) SETTER_R(name, field) noexcept { field = value; }
 #define SETTER_RC_DEFAULT(name, field) SETTER_RC(name, field) noexcept { field = value; }
 
+#define iterator_expand(range) (range).begin(), (range).end()
+#define citerator_expand(range) (range).cbegin(), (range).cend()
+
 #endif //UTILITIES_MACRO_HPP
