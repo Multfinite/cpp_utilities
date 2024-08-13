@@ -2,6 +2,7 @@
 #define UTILITIES_MATH_HPP
 
 #include <cmath>
+#include <ostream>
 
 #define fraction_inlined(x) (x - std::floor(x))
 
@@ -39,16 +40,24 @@ namespace Utilities::Math
 
         inline TNumeric length_squared() const noexcept { return X * X + Y * Y; }
         inline TNumeric length() const noexcept { return sqrt(length_squared()); }
-
-        static vector_type max(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::max(a.X, b.X), std::max(a.Y, b.Y) }; }
-        static vector_type min(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::min(a.X, b.X), std::min(a.Y, b.Y) }; }
-        static vector_type abs(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::abs(a.X, b.X), std::abs(a.Y, b.Y) }; }
-        static vector_type compound(vector_type const& a, vector_type const& b) noexcept { return vector_type { a.X * b.X, a.Y * b.Y }; }
+        inline vector_type normalize() const noexcept
+        {
+            if(!X && !Y) return *this;
+            TNumeric const length = length();
+            return vector_type { X / length, Y / length };
+        }
+        
+        inline static vector_type max(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::max(a.X, b.X), std::max(a.Y, b.Y) }; }
+        inline static vector_type min(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::min(a.X, b.X), std::min(a.Y, b.Y) }; }
+        inline static vector_type abs(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::abs(a.X, b.X), std::abs(a.Y, b.Y) }; }
+        inline static vector_type compound(vector_type const& a, vector_type const& b) noexcept { return vector_type { a.X * b.X, a.Y * b.Y }; }
 
         template<typename TValueTypeTo>
         inline static Vector2<TValueTypeTo> static_cast_to(vector_type const& v) noexcept { return Vector2<TValueTypeTo> { static_cast<TValueTypeTo>(v.X), static_cast<TValueTypeTo>(v.Y) }; }
         template<typename TValueTypeFrom>
         inline static vector_type static_cast_from(Vector2<TValueTypeFrom> const& v) noexcept { return vector_type { static_cast<value_type>(v.X), static_cast<value_type>(v.Y) }; }
+
+        inline friend std::ostream& operator<<(std::ostream& stream, vector_type const& v) noexcept { return stream << "{ " << v.X << ", " << v.Y << " }"; }
     };
 
     /*
