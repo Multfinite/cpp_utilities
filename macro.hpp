@@ -115,7 +115,7 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
          return x != end ? &*x : nullptr;
 }
 
-#define GETTER_NAME(name) get_##name
+#define GETTER_NAME(name) name
 #define SETTER_NAME(name) set_##name
 
 #define GETTER_DECL(name, type) type GETTER_NAME(name)()
