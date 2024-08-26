@@ -28,6 +28,7 @@
 #if ENABLE_NLOHMANN_JSON == 1
 #include <nlohmann/json.hpp>
 using nlohmann::json;
+using nlohmann::ordered_json;
 #endif
 
 #if ENABLE_STDUUID == 1
