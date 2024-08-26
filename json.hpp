@@ -127,26 +127,26 @@ namespace Utilities::JSON
 			j[p] = v.value();
 	}
 
-        inline nlohmann::json message(std::string const& msg)
+        inline nlohmann::ordered_json message(std::string const& msg)
         {
-            return nlohmann::json { { "message", msg } };
+            return nlohmann::ordered_json { { "message", msg } };
         }
 
         template<typename T>
-        inline nlohmann::json message(std::string const& msg, T&& context)
+        inline nlohmann::ordered_json message(std::string const& msg, T&& context)
         {
-            return nlohmann::json { { "message", msg }, { "context", context } };
+            return nlohmann::ordered_json { { "message", msg }, { "context", context } };
         }
 
         template<typename ...T>
-        inline nlohmann::json message(std::string const& msg, T&& ...context)
+        inline nlohmann::ordered_json message(std::string const& msg, T&& ...context)
         {
-            auto ctx = nlohmann::json::array();
+            auto ctx = nlohmann::ordered_json::array();
             ([&]
             {
                 ctx.push_back(context);
             }, ...);
-            return nlohmann::json { { "message", msg }, { "context", ctx } };
+            return nlohmann::ordered_json { { "message", msg }, { "context", ctx } };
         }
 }
 
