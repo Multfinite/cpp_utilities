@@ -80,6 +80,61 @@ namespace Utilities
 		{
                         spdlog::critical(msg.dump(indent, indent_char, ensure_ascii, error_handler));
 		}
+
+                inline void trace(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::trace(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
+                inline void debug(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::debug(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
+                inline void info(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::info(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
+                inline void warn(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::warn(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
+                inline void error(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::error(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
+                inline void critical(
+                        ordered_json const& msg,
+                        const int indent = -1,
+                        const char indent_char = ' ',
+                        const bool ensure_ascii = false,
+                        const nlohmann::ordered_json::error_handler_t error_handler = nlohmann::ordered_json::error_handler_t::strict)
+                {
+                        spdlog::critical(msg.dump(indent, indent_char, ensure_ascii, error_handler));
+                }
 #endif
 	};
 }
