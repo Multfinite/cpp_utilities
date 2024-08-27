@@ -145,9 +145,9 @@ namespace Utilities
 
         template<
                 typename TContainer
-              , typename TAction /* void action(decltype(container)::value_type& x) */
               , typename TPredicate /* bool predicate(decltype(container)::value_type const& x) */
-        > inline typename TContainer::size_type execute_if(TContainer& container, TAction const& action, TPredicate const& predicate) noexcept
+              , typename TAction /* void action(decltype(container)::value_type& x) */              
+        > inline typename TContainer::size_type execute_if(TContainer& container, TPredicate const& predicate, TAction const& action) noexcept
         {
             typename TContainer::size_type count = 0;
             for(typename TContainer::value_type& item : container)
