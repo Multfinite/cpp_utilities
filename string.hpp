@@ -55,7 +55,7 @@ namespace Utilities
         return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
     }
     
-    inline std::string string_tolower(const std::string& str)
+    inline std::string string_tolower(const std::string& str) noexcept
     {
         std::string s = str;
         std::transform(
@@ -70,7 +70,7 @@ namespace Utilities
         std::string& s,
         const std::string& toReplace,
         const std::string& replaceWith
-    ) {
+    ) noexcept {
         std::string buf;
         std::size_t pos = 0;
         std::size_t prevPos;
@@ -95,7 +95,7 @@ namespace Utilities
     inline std::string string_replace_all_templates(
         const std::string& s,
         const std::map<std::string, std::string>& replacements
-    ) {
+    ) noexcept {
         std::string str = s;
         for (auto& kvp : replacements)
         {
@@ -106,14 +106,14 @@ namespace Utilities
     inline void string_replace_all_templates(
        std::string& s,
        const std::map<std::string, std::string>& replacements
-    ) {
+    ) noexcept {
         for (auto& kvp : replacements)
         {
             string_replace_all(s, kvp.first, kvp.second);
         }
     }
     
-    inline std::list<std::string> string_split(const std::string& str, const std::string& delimiter)
+    inline std::list<std::string> string_split(const std::string& str, const std::string& delimiter) noexcept
     {
         std::string s = str;
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
@@ -132,7 +132,7 @@ namespace Utilities
         return res;
     }
 
-    inline std::list<std::string> string_split_ret_s(const std::string& s, const std::string& delimiter)
+    inline std::list<std::string> string_split_ret_s(const std::string& s, const std::string& delimiter) noexcept
     {
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;
@@ -154,7 +154,7 @@ namespace Utilities
     }
 
     template<typename ...T>
-    inline std::string string_join(const std::string& separator, const T& ...items)
+    inline std::string string_join(const std::string& separator, const T& ...items) noexcept
     {
         std::stringstream s; bool f = true;
         /*
@@ -172,7 +172,7 @@ namespace Utilities
         return s.str();
     }
 
-    inline std::string::size_type string_indexof(const std::string& s, char c)
+    inline std::string::size_type string_indexof(const std::string& s, char c) noexcept
     {
         auto iter = std::find_if(s.cbegin(), s.cend(), [&c](char chr) { return chr == c; });
         if(iter == s.cend()) throw "not found";
@@ -187,7 +187,7 @@ namespace Utilities
         return s.substr(il, (ir - il) + 1);
     }
 
-    inline std::string string_between(std::string::iterator a, std::string::iterator b)
+    inline std::string string_between(std::string::iterator a, std::string::iterator b) noexcept
     {
         std::stringstream ss;
         for(++a; a != b; ++a)
@@ -195,7 +195,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_between(std::string::const_iterator a, std::string::const_iterator b)
+    inline std::string string_between(std::string::const_iterator a, std::string::const_iterator b) noexcept
     {
         std::stringstream ss;
         for(++a; a != b; ++a)
@@ -203,7 +203,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
+    inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right) noexcept
     {
         if(right <= left) throw "right <= left";
         std::stringstream ss;
@@ -215,7 +215,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_remove_range(const std::string& s, std::string::size_type left, std::string::size_type right)
+    inline std::string string_remove_range(const std::string& s, std::string::size_type left, std::string::size_type right) noexcept
     {
         if(right <= left) throw "right <= left";
         std::stringstream ss;
@@ -227,7 +227,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_extract(std::string& s, char left, char right)
+    inline std::string string_extract(std::string& s, char left, char right) noexcept
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         auto between = s.substr(il + 1,((ir - il) + 1) - 2); // +1, -2 <= don't catch borders
@@ -235,7 +235,7 @@ namespace Utilities
         return between;
     }
 
-    inline bool string_starts_with(const std::string& s, const std::string& prefix)
+    inline bool string_starts_with(const std::string& s, const std::string& prefix) noexcept
     {
 #if CPP_SINCE(__cplusplus, CPP20)
         return s.starts_with(prefix);
@@ -249,6 +249,15 @@ namespace Utilities
         }
         return true;
 #endif
+    }
+
+    inline bool is_white_space(std::string const& s) noexcept
+    {
+        return s.size() == size_t(std::count_if(s.begin(), s.end(), [](std::string::value_type x) -> bool { return std::isspace(x); }));
+    }
+    inline bool is_empty_or_white_space(std::string const& s) noexcept
+    {
+        return s.empty() || is_white_space(s);
     }
 }
 
