@@ -143,6 +143,22 @@ namespace Utilities
             dst.assign(other.cbegin(), other.cend());
         }
 
+        template<
+                typename TContainer
+              , typename TAction /* void action(decltype(container)::value_type& x) */
+              , typename TPredicate /* bool predicate(decltype(container)::value_type const& x) */
+        > inline typename TContainer::size_type execute_if(TContainer& container, TAction const& action, TPredicate const& predicate) noexcept
+        {
+            typename TContainer::size_type count = 0;
+            for(typename TContainer::value_type& item : container)
+                if(predicate(item))
+                {
+                    action(count);
+                    ++count;
+                }
+            return count;
+        }
+
         /*!
          * @brief Clone (deep copy) object. Must be specialized before - it's just interface.
          * @arg o: object-source
