@@ -172,7 +172,7 @@ namespace Utilities
         return s.str();
     }
 
-    inline std::string::size_type string_indexof(const std::string& s, char c) noexcept
+    inline std::string::size_type string_indexof(const std::string& s, char c)
     {
         auto iter = std::find_if(s.cbegin(), s.cend(), [&c](char chr) { return chr == c; });
         if(iter == s.cend()) throw "not found";
@@ -227,7 +227,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_extract(std::string& s, char left, char right) noexcept
+    inline std::string string_extract(std::string& s, char left, char right)
     {
         auto il = string_indexof(s, left); auto ir = string_indexof(s, right);
         auto between = s.substr(il + 1,((ir - il) + 1) - 2); // +1, -2 <= don't catch borders
