@@ -153,7 +153,7 @@ namespace Utilities
             for(typename TContainer::value_type& item : container)
                 if(predicate(item))
                 {
-                    action(count);
+                    action(item);
                     ++count;
                 }
             return count;
