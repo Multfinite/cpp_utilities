@@ -203,7 +203,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right) noexcept
+    inline std::string string_remove_between(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
         if(right <= left) throw "right <= left";
         std::stringstream ss;
@@ -215,7 +215,7 @@ namespace Utilities
         return ss.str();
     }
 
-    inline std::string string_remove_range(const std::string& s, std::string::size_type left, std::string::size_type right) noexcept
+    inline std::string string_remove_range(const std::string& s, std::string::size_type left, std::string::size_type right)
     {
         if(right <= left) throw "right <= left";
         std::stringstream ss;
