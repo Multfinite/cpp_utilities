@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <list>
 #include <map>
+#include <vector>
 #include <algorithm>
 #include <sstream>
 
@@ -258,6 +259,60 @@ namespace Utilities
     inline bool is_empty_or_white_space(std::string const& s) noexcept
     {
         return s.empty() || is_white_space(s);
+    }
+
+    inline std::map<std::string, std::string> csv_parse_pairs(std::string const& s, std::string const& rowDelimiter, std::string const& columnDelimiter) noexcept
+    {
+        std::map<std::string, std::string> pairs;
+        auto const splittenRows = string_split_ret_s(s, rowDelimiter);
+        for(std::string const& row : splittenRows)
+        {
+            auto const splittenColumn = string_split_ret_s(row, columnDelimiter);
+            pairs[splittenColumn.front()] = splittenColumn.size() > 1 ? splittenColumn.back() : "";
+        }
+        return pairs;
+    }
+    inline std::string csv_dump_pairs(std::map<std::string, std::string> const& pairs, std::string const& rowDelimiter, std::string const& columnDelimiter) noexcept
+    {
+        std::stringstream ss;
+        for(auto it = pairs.begin(); it != pairs.end(); ++it)
+        {
+            ss << it->first;
+            if(!it->second.empty())
+                ss << columnDelimiter << it->second;
+            auto itn = it; ++itn;
+            if(itn != pairs.end())
+                ss << rowDelimiter;
+        }
+        return ss.str();
+    }
+
+    inline std::list<std::list<std::string>> csv_parse(std::string const& s, std::string const& rowDelimiter, std::string const& columnDelimiter) noexcept
+    {
+        std::list<std::list<std::string>> table;
+        auto const splittenRows = string_split_ret_s(s, rowDelimiter);
+        for(std::string const& row : splittenRows)
+            table.push_back(string_split_ret_s(row, columnDelimiter));
+        return table;
+    }
+    inline std::string csv_dump(std::list<std::list<std::string>> const& table, std::string const& rowDelimiter, std::string const& columnDelimiter) noexcept
+    {
+        std::stringstream ss;
+        for(auto rit = table.begin(); rit != table.end(); ++rit)
+        {
+            for(auto cit = rit->begin(); cit != rit->end(); ++cit)
+            {
+                ss << *cit;
+                auto citn = cit; ++citn;
+                if(cit != rit->end())
+                    ss << columnDelimiter;
+            }
+
+            auto ritn = rit; ++ritn;
+            if(ritn != table.end())
+                ss << rowDelimiter;
+        }
+        return ss.str();
     }
 }
 
