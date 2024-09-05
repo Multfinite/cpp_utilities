@@ -52,7 +52,16 @@ namespace Utilities
         }
 
         template<typename TContainer>
-        auto find(const TContainer& container, const typename TContainer::value_type& _Val, bool raise = true) ->
+        auto find(TContainer const& container, const typename TContainer::value_type& _Val, bool raise = true) ->
+                decltype(container.begin(), container.end())
+        {
+                auto iterator = std::find(container.begin(), container.end(), _Val);
+                if (raise && iterator == container.end())
+                        throw construct_error_no_msg(Exceptions::item_not_found_exception);
+                return iterator;
+        }
+        template<typename TContainer>
+        auto find(TContainer& container, const typename TContainer::value_type& _Val, bool raise = true) ->
                 decltype(container.begin(), container.end())
         {
                 auto iterator = std::find(container.begin(), container.end(), _Val);
@@ -61,7 +70,16 @@ namespace Utilities
                 return iterator;
         }
         template<typename TContainer, typename TPredicate>
-        auto find_if(const TContainer& container, const TPredicate& pred, bool raise = true) ->
+        auto find_if(TContainer const& container, const TPredicate& pred, bool raise = true) ->
+                decltype(container.begin(), container.end())
+        {
+                auto iterator = std::find_if(container.begin(), container.end(), pred);
+                if (raise && iterator == container.end())
+                        throw construct_error_no_msg(Exceptions::item_not_found_exception);
+                return iterator;
+        }
+        template<typename TContainer, typename TPredicate>
+        auto find_if(TContainer& container, const TPredicate& pred, bool raise = true) ->
                 decltype(container.begin(), container.end())
         {
                 auto iterator = std::find_if(container.begin(), container.end(), pred);
