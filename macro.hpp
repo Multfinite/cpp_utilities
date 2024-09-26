@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <type_traits>
 #include <initializer_list>
+#include <tuple>
 
 template<typename T>
 inline T& reference_cast(T* ptr)
@@ -114,6 +115,18 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
     else
          return x != end ? &*x : nullptr;
 }
+
+/* https://stackoverflow.com/a/17856416 --> */
+
+template<unsigned...s> struct seq { typedef seq<s...> type; };
+template<unsigned max, unsigned... s> struct make_seq:make_seq<max-1, max-1, s...> {};
+template<unsigned...s> struct make_seq<0, s...>:seq<s...> {};
+template<unsigned... s, typename Tuple>
+auto extract_tuple( seq<s...>, Tuple& tup ) {
+  return std::make_tuple( std::get<s>(tup)... );
+}
+
+/* <-- https://stackoverflow.com/a/17856416 */
 
 #define GETTER_NAME(name) name
 #define SETTER_NAME(name) set_##name
