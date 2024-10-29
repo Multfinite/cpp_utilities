@@ -33,6 +33,14 @@ namespace Utilities::Math
         inline vector_type operator/(TNumeric scalar) const noexcept { return vector_type { X / scalar, Y / scalar }; };
         inline bool operator==(vector_type const& other) const noexcept { return X == other.X && Y == other.Y; };
         inline bool operator!=(vector_type const& other) const noexcept { return X == other.X && Y == other.Y; };
+        inline TNumeric operator[](size_t index) const
+        {
+            switch(index) {
+                case(0): return X;
+                case(1): return Y;
+            }
+            throw std::out_of_range("");
+        }
 
         inline vector_type ceil() const noexcept { return vector_type { std::ceil(X), std::ceil(Y) }; };
         inline vector_type round() const noexcept { return vector_type { std::round(X), std::round(Y) }; };
@@ -58,6 +66,19 @@ namespace Utilities::Math
         inline static vector_type static_cast_from(Vector2<TValueTypeFrom> const& v) noexcept { return vector_type { static_cast<value_type>(v.X), static_cast<value_type>(v.Y) }; }
 
         inline friend std::ostream& operator<<(std::ostream& stream, vector_type const& v) noexcept { return stream << "{ " << v.X << ", " << v.Y << " }"; }
+    };
+
+    template<typename TNumeric>
+    struct Matrix2
+    {
+        using value_type = TNumeric;
+        using vector_type = Vector2<value_type>;
+
+        vector_type R0 {1,0}, R1 {0,1};
+
+        constexpr Matrix2() = default;
+        constexpr Matrix2(value_type xr0, value_type yr0, value_type xr1, value_type yr1) : R0(vector_type{xr0, yr0}), R1(vector_type{xr1, yr1}) {}
+        constexpr Matrix2(vector_type r0, vector_type r1) : R0(r0), R1(r1) {}
     };
 
     /*
