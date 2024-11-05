@@ -116,6 +116,8 @@ inline auto value_of_iterator(TIterator const& x, TIterator const& end)
          return x != end ? &*x : nullptr;
 }
 
+struct noinit_t{};
+
 /* https://stackoverflow.com/a/17856416 --> */
 
 template<unsigned...s> struct seq { typedef seq<s...> type; };
