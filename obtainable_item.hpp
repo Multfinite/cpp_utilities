@@ -5,6 +5,9 @@
 
 namespace Utilities
 {
+	/*!
+	* @brief Monitor
+	*/
 	template<typename T>
 	struct obtainable_item
 	{
@@ -30,8 +33,8 @@ namespace Utilities
 			_item(rhs._item), _mutex(rhs._mutex)
 		{}
 
-		item_lock<value_type> obtain() { return item_lock<value_type> { *_item.get(), *_mutex.get() }; }
-		value_type& direct() { return *_item.get(); }
+		constexpr item_lock<value_type> obtain() { return item_lock<value_type> { *_item.get(), *_mutex.get() }; }
+		constexpr value_type& get_unsafe() { return *_item.get(); }
 	};
 }
 

@@ -3,15 +3,14 @@
 
 #include <mutex>
 #include <functional>
+#include <list>
 
 namespace Utilities
 {
 	using std::mutex;
 	using std::list;
-	using std::vector;
 	using std::reference_wrapper;
 
-	struct __try_lock {};
 	template<typename T>
 	struct item_lock 
 	{
@@ -21,8 +20,11 @@ namespace Utilities
 		T& _item;
 		list<reference_wrapper<std::mutex>> _mutexes;
 	public:
-		T& item() { return _item; }
-		item_lock(T& item) : _item(item) {}
+		constexpr T& item() noexcept { return _item; }
+		constexpr T& operator*() noexcept { return _item; }
+		constexpr T* operator->() noexcept { return &_item; }
+
+		item_lock(T& item) : _item(item) {}		
 
 		template<typename ...TMutexes>
 		item_lock(T& item, TMutexes&... mutexes) :  _item(item) 
