@@ -26,8 +26,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	add_compile_options(-g)						# debug info, system specific
 #	add_compile_options(-Og)						# optimization: debug
-        add_compile_options(-std=c++20)                             # C++ standard
-        add_compile_options(-fpermissive)                             # required for some pieces of code
+    add_compile_options(-std=c++20)                             # C++ standard
+    add_compile_options(-fpermissive)                             # required for some pieces of code
 	add_compile_options(-Wchanges-meaning)
 else()
 endif()
