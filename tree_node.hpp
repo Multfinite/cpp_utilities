@@ -19,9 +19,9 @@ namespace Utilities
             events_t(TreeNode& node) : ParentChanged(node) {}
         } Event;
 
-        bool is_root() const { return !_parent; }
+        constexpr bool is_root() const { return !_parent; }
 
-        GETTER_V_DEFAULT(parent, _parent)
+        constexpr GETTER_V_DEFAULT(parent, _parent)
         SETTER_V(parent, _parent)
         {
             auto* old = _parent;
@@ -32,7 +32,7 @@ namespace Utilities
         }
 
         template<typename T>
-        constexpr T* parent_as() const noexcept { return reinterpret_cast<T*>(_parent); }
+        constexpr T* parent_as() const noexcept { return static_cast<T*>(_parent); }
 
         auto begin() const { return _chlidrens.begin(); }
         auto end() const { return _chlidrens.end(); }
