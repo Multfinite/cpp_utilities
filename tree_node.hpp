@@ -41,6 +41,7 @@ namespace Utilities
         auto cend() const { return _chlidrens.cend(); }
 
         TreeNode() : Event(*this) {}
+        virtual ~TreeNode() {} // need to use dynamic_cast
     };
 }
 
