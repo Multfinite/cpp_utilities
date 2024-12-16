@@ -33,25 +33,25 @@ else()
 endif()
 
 # test that filesystem header actually is there and works
-try_compile(HAS_FS "${CMAKE_BINARY_DIR}/temp"
-"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_filesystem.cpp"
-            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
-            LINK_LIBRARIES stdc++fs)
-try_compile(HAS_FS_EXPERIMENTAL "${CMAKE_BINARY_DIR}/temp"
-"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_experimental_filesystem.cpp"
-            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
-            LINK_LIBRARIES stdc++fs)
-
-if(HAS_FS)
-    message(STATUS "Compiler has filesystem support")
-    target_compile_definitions(defs_proxy INTERFACE STD_FS=1)
-elseif(HAS_FS_EXPERIMENTAL)
-    message(STATUS "Compiler has EXPERIMENTAL filesystem support")
-     add_compile_definitions(defs_proxy INTERFACE STD_FS=2)
-else()
-    message(FATAL_ERROR "Compiler is missing filesystem capabilities")
-    add_compile_definitions(defs_proxy INTERFACE STD_FS=0)
-endif()
+#try_compile(HAS_FS "${CMAKE_BINARY_DIR}/temp"
+#"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_filesystem.cpp"
+#            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
+#            LINK_LIBRARIES stdc++fs)
+#try_compile(HAS_FS_EXPERIMENTAL "${CMAKE_BINARY_DIR}/temp"
+#"${CMAKE_CURRENT_SOURCE_DIR}/tests/has_experimental_filesystem.cpp"
+#            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=OFF
+#            LINK_LIBRARIES stdc++fs)
+#
+#if(HAS_FS)
+#    message(STATUS "Compiler has filesystem support")
+#    target_compile_definitions(defs_proxy INTERFACE STD_FS=1)
+#elseif(HAS_FS_EXPERIMENTAL)
+#    message(STATUS "Compiler has EXPERIMENTAL filesystem support")
+#    add_compile_definitions(defs_proxy INTERFACE STD_FS=2)
+#else()
+#    message(FATAL_ERROR "Compiler is missing filesystem capabilities")
+#    add_compile_definitions(defs_proxy INTERFACE STD_FS=0)
+#endif()
 
 #file(GLOB_RECURSE src
 file(GLOB src "*.cpp")
@@ -89,7 +89,7 @@ else()
 endif()
 
 find_package(spdlog CONFIG)
-if(TARGET stduuid OR stduuid_FOUND)
+if(TARGET spdlog OR spdlog_FOUND)
     target_link_libraries(utilities_lib PUBLIC spdlog::spdlog spdlog::spdlog_header_only)
     target_compile_definitions(defs_proxy INTERFACE ENABLE_SPDLOG=1)
 else()
