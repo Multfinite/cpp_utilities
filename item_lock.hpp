@@ -15,10 +15,10 @@ namespace Utilities
 	struct item_lock 
 	{
 	public:
-		
+		struct try_lock_t {};
 	private:
 		T& _item;
-		list<reference_wrapper<std::mutex>> _mutexes;
+		std::list<reference_wrapper<std::mutex>> _mutexes;
 	public:
 		constexpr T& item() noexcept { return _item; }
 		constexpr T& operator*() noexcept { return _item; }
@@ -32,7 +32,7 @@ namespace Utilities
 			lock(mutexes...);
 		}
 		template<typename ...TMutexes>
-		item_lock(T& item, __try_lock ty, TMutexes&... mutexes) : _item(item)
+		item_lock(try_lock_t&&, T& item, TMutexes&... mutexes) : _item(item)
 		{
 			auto index = try_lock(mutexes...);
 			if (index != -1)
@@ -43,30 +43,31 @@ namespace Utilities
 			unlock();
 		}
 
-		template<typename ...TMutexes>
-		void lock(TMutexes&... mutexes)
-		{
-			std::lock(mutexes);
-			_mutexes = { mutexes };
-		}
-		template<>
-		void lock<std::mutex>(std::mutex& mutex)
+		void lock(std::mutex& mutex)
 		{
 			mutex.lock();
 			_mutexes = { mutex };
 		}
+
 		template<typename ...TMutexes>
-		auto try_lock(TMutexes&... mutexes)
+		void lock(TMutexes& ...mutexes)
 		{
-			auto r = std::try_lock(mutexes);
-			_mutexes = { mutexes };
-			return r;
+			std::lock(mutexes...);
+			_mutexes = { mutexes... };
 		}
-		template<>
-		auto try_lock<std::mutex>(std::mutex& mutex)
+
+		auto try_lock(std::mutex& mutex)
 		{
 			int r = mutex.try_lock() ? -1 : 0;
 			_mutexes = { mutex };
+			return r;
+		}
+
+		template<typename ...TMutexes>
+		auto try_lock(TMutexes& ...mutexes)
+		{
+			auto r = std::try_lock(mutexes...);
+			_mutexes = { mutexes... };
 			return r;
 		}
 		void unlock()
