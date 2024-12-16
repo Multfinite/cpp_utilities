@@ -18,18 +18,18 @@ namespace Utilities
 		std::shared_ptr<std::mutex> _mutex;
 	public:
 		obtainable_item() : 
-			_mutex(make_shared<std::mutex>()),
-			_item(make_shared<value_type>()) 
+			_mutex(std::make_shared<std::mutex>()),
+			_item(std::make_shared<value_type>()) 
 		{}
 		template<typename ...TArgs>
 		obtainable_item(TArgs&&... args) :
-			_mutex(make_shared<std::mutex>()),
-			_item(make_shared<value_type>(args...))
+			_mutex(std::make_shared<std::mutex>()),
+			_item(std::make_shared<value_type>(args...))
 		{}
 		obtainable_item(obtainable_item<T>&& rhs) : 
 			_item(rhs._item), _mutex(rhs._mutex)
 		{}
-		obtainable_item(const obtainable_item<T>& rhs) :
+		obtainable_item(obtainable_item<T> const& rhs) :
 			_item(rhs._item), _mutex(rhs._mutex)
 		{}
 
