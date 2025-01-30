@@ -76,6 +76,7 @@ struct _alias_t \
 	}; \
 } \
 
+// Simplify pagination checks.
 #define PAGINATION_CHECK(pageIndex, pageItems) \
 	bool paginated = (pageIndex.has_value() && pageItems.has_value()); \
 	if (!( \
@@ -129,6 +130,9 @@ namespace Utilities::SQLPP
 	template<typename object_type>
 	inline identifier_type generate_identifier(object_type& t) { return generate_identifier<object_type>(); }
 
+	/*!
+	* @brief sqlpp result type to optional<T>.
+	*/
 	template<typename TResultType>
 	inline auto get_value(TResultType r)
 	{
@@ -141,12 +145,18 @@ namespace Utilities::SQLPP
 		return ret;
 	}
 
+	/*!
+	* @brief Convert sqlpp_type to string SQL representation.
+	*/
 	template<typename sqlpp_type>
 	string get_schema_type_name() { throw "NOT IMPLEMENTED"; }
 	template<> string get_schema_type_name<sqlpp::text>() { return "text"; }
 	template<> string get_schema_type_name<sqlpp::integer>() { return "int"; }
 	template<> string get_schema_type_name<sqlpp::time_point>() { return "timestamp"; }
 
+	/*!
+	* @brief Convert table columns to sequence of it's names.
+	*/
 	template<typename sqlpp_table_type>
 	vector<string> all_of_as_list(sqlpp_table_type& t);
 	#define column_nameof(table, column) table##_::column::_alias_t::_literal
@@ -155,6 +165,9 @@ namespace Utilities::SQLPP
 #ifndef UTILITIES_SQLPP_NO_JSON
 	using nlohmann::json;
 
+	/*!
+	* @breif Set json object field wi
+	*/
 	template<typename result_field>
 	void field_to_json(result_field& item, json& j)
 	{
@@ -166,14 +179,21 @@ namespace Utilities::SQLPP
 		});
 	}
 
+	/*!
+	* @brief Perform insertion of given items to table
+	* @param [db] The sqlpp database connection
+	* @param [t] sqlpp table type which is insertion target
+	* @param [items] container of json's items
+	* @param [returning] column to return of inserted items, default to "id"
+	*/
 	template<typename sqlpp_table_type, typename container_type>
 	auto insert_json_into(DatabaseConnection& db, sqlpp_table_type& t, container_type& items, string returning = "id")
 	{
 		if (items.empty())
 			construct_error_no_msg(Exceptions::REST::invalid_argument_error);
 
-		// table name
 		std::string query = "insert into %table% %columns% values %values% returning %returning%;";
+		// table name
 		Utilities::string_replace_all_templates(query, {
 			{ "%table%", sqlpp_table_type::_alias_t::_literal },
 			{ "%returning%", returning } 
@@ -206,6 +226,14 @@ namespace Utilities::SQLPP
 		return db(q);
 	}
 
+	/*!
+	* @brief Perform insertion of given items to table
+	* @param [db] The sqlpp database connection
+	* @param [t] sqlpp table type which is insertion target
+	* @param [items] container of json's items [json(json const& rawItem)]
+	* @param [itemHandler] do something with json item before insertion
+	* @param [returning] column to return of inserted items, default to "id"
+	*/
 	template<typename sqlpp_table_type, typename container_type, typename callable_type >
 	auto insert_json_into_with_callable(DatabaseConnection& db, sqlpp_table_type& t, container_type& items, callable_type itemHandler, string returning = "id")
 	{
@@ -247,6 +275,8 @@ namespace Utilities::SQLPP
 		return db(q);
 	}
 
+
+// if page and perpage parameters is correct then select page otherwise select all
 #define SQLPP_CONDITIONAL_SELECT(db, o, columns, condition, items, page, perpage) \
 { \
 	if (page.has_value() && perpage.has_value()) \
