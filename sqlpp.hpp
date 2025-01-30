@@ -275,6 +275,40 @@ namespace Utilities::SQLPP
 		return db(q);
 	}
 
+	/*!
+	* @brief Update table row by given json object representation
+	* @param [db] The sqlpp database connection
+	* @param [t] sqlpp table type which is insertion target
+	* @param [j] json where each key is column 
+	* @param[where] selector of items to update. for example it can be: "t.identifier = \"xxxx-...\""
+	*/
+	template<typename sqlpp_table_type>
+	auto update_json(DatabaseConnection& db, sqlpp_table_type& t, nlohmann::json& j, std::optional<std::string> where = std::nullopt)
+	{
+		std::string query = "update %table% as t set %values%%where%;";
+		// table name
+		Utilities::string_replace_all_templates(query, {
+			{ "%table%", sqlpp_table_type::_alias_t::_literal }
+		});
+		// SET t.c = value
+		stringstream ss;
+		for (auto& kvp : j.items())
+		{
+			ss << "%b%"
+				<< "t." << kvp.key() << " = "
+				<< kvp.value()
+				<< "%e%";
+		}
+		std::string values = ss.str();
+		Utilities::string_replace_all(values, "%e%%b%", ",");
+		Utilities::string_replace_all_templates(values, { { "%b%", "" }, { "%e%", "" } });
+		Utilities::string_replace_all(query, "%values%", values);
+		Utilities::string_replace_all(query, "%where%", where ? (" " + *where) : "");
+
+		auto q = sqlpp::custom_query(sqlpp::verbatim(query))
+			.with_result_type_of(sqlpp::update(sqlpp::value(0).as(sqlpp::alias::a)));
+		return db(q);
+	}
 
 // if page and perpage parameters is correct then select page otherwise select all
 #define SQLPP_CONDITIONAL_SELECT(db, o, columns, condition, items, page, perpage) \
