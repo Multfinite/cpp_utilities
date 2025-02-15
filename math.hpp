@@ -82,11 +82,336 @@ namespace Utilities::Math
     };
 
     /*
+    template<typename TNumeric, size_t size_>
+    struct Vector
+    {
+        constexpr static size_t Size = size_;
+        constexpr size_t size() const noexcept { return Size; }
+
+        using value_type = TNumeric;
+        using vector_type = Vector<TNumeric, Size>;
+        using array_type = value_type[Size];
+
+        array_type Value[Size];
+
+        constexpr value_type& operator[](size_t index) noexcept { return Value[index]; }
+        constexpr value_type const& operator[](size_t index) const noexcept { return Value[index]; }
+
+        constexpr vector_type operator+(vector_type const& other) const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = *this[i] + other[i];
+            return v;
+        };
+        constexpr vector_type operator-(vector_type const& other) const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = *this[i] - other[i];
+            return v;
+        };
+        constexpr vector_type operator-() const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = -*this[i];
+            return v;
+        };
+        constexpr vector_type operator*(value_type scalar) const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = *this[i] * scalar;
+            return v;
+        };
+        constexpr vector_type operator/(value_type scalar) const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = *this[i] / scalar;
+            return v;
+        };
+        constexpr bool operator==(vector_type const& other) const noexcept {
+            for(size_t i = 0; i < size(); ++i)
+                if(*this[i] != other[i])
+                    return false;
+            return true;
+        };
+        constexpr bool operator!=(vector_type const& other) const noexcept  {
+            for(size_t i = 0; i < size(); ++i)
+                if(Value[i] != other.Value[i])
+                    return true;
+            return false;
+        };
+
+        constexpr value_type length_squared() const noexcept {
+            value_type sum = 0;
+            for(size_t i = 0; i < size(); ++i)
+                sum += *this[i] * *this[i];
+            return sum;
+        };
+        constexpr TNumeric length() const noexcept { return sqrt(length_squared()); }
+        constexpr vector_type normalize() const noexcept
+        {
+            if(!*this[0] && !*this[1] && !*this[2]) return *this;
+            return *this / length();
+        }
+
+        constexpr vector_type ceil() const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = std::ceil(*this[i]);
+            return v;
+        };
+        constexpr vector_type round() const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = std::round(*this[i]);
+            return v;
+        };
+        constexpr vector_type floor() const noexcept {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = std::floor(*this[i]);
+            return v;
+        };
+        constexpr vector_type abs() {
+            vector_type v;
+            for(size_t i = 0; i < size(); ++i)
+                v[i] = std::abs(*this[i]);
+            return v;
+        };
+
+        constexpr static vector_type max(vector_type const& a, vector_type const& b) noexcept {
+            vector_type v;
+            for(size_t i = 0; i < a.size(); ++i)
+                v[i] = std::max(a[i], b[i]);
+            return v;
+        };
+        constexpr static vector_type min(vector_type const& a, vector_type const& b) noexcept {
+            vector_type v;
+            for(size_t i = 0; i < a.size(); ++i)
+                v[i] = std::min(a[i], b[i]);
+            return v;
+        };
+        constexpr static vector_type compound(vector_type const& a, vector_type const& b) noexcept {
+            vector_type v;
+            for(size_t i = 0; i < a.size(); ++i)
+                v[i] = a[i] * b[i];
+            return v;
+        };
+
+        constexpr void fill(value_type&& v) noexcept {
+            for(size_t i = 0; i < size(); ++i)
+                *this[i] = v;
+        }
+
+        constexpr Vector() = default;
+        constexpr Vector(value_type&& v) : Value({v, v, v}) {}
+        constexpr Vector(value_type v) : Value({v, v, v}) {}
+        constexpr Vector(array_type&& arr) : Value(arr) {}
+        constexpr Vector(array_type const& arr) : Value(arr) {}
+
+        constexpr static vector_type Zero() noexcept {
+            vector_type v;
+            for(size_t i = 0; i < v.size(); ++i)
+                v[i] = 0;
+            return v;
+        }
+        constexpr static vector_type Axis(size_t index) noexcept {
+            vector_type v;
+            for(size_t i = 0; i < v.size(); ++i)
+                v[i] = 0;
+            v[index] = 1;
+            return v;
+        }
+
+        inline friend std::ostream& operator<<(std::ostream& stream, vector_type const& v) noexcept {
+            stream << "{ ";
+            for(size_t i = 0; i < v.size(); ++i)
+                    stream << (i == 0 ? "" : ", ") << v[i];
+            return stream << " }";
+        }
+    };
+
+    template<typename TNumeric, size_t rows_, size_t columns_>
+    struct Matrix
+    {
+        constexpr static size_t Rows = rows_;
+        constexpr static size_t Columns = columns_;
+        constexpr static size_t Size = Rows * Columns;
+        constexpr size_t rows() const noexcept { return Rows; }
+        constexpr size_t columns() const noexcept { return Columns; }
+        constexpr size_t size() const noexcept { return Size; }
+
+        using value_type = TNumeric;
+        using row_t = Vector<value_type, Columns>;
+        using column_t = Vector<value_type, Rows>;
+        using array_type = row_t[Rows];
+        using matrix_type = Matrix<value_type, Rows, Columns>;
+        using matrix_transposed_type = Matrix<value_type, Rows, Columns>;
+
+        array_type Value;
+
+        constexpr row_t& operator[](size_t index) noexcept { return Value[index]; }
+        constexpr row_t const& operator[](size_t index) const noexcept { return Value[index]; }
+
+        constexpr matrix_type operator+(matrix_type const& other) const noexcept {
+            matrix_type m;
+            for(size_t i = 0; i < rows(); ++i)
+                m[i] = *this[i] + other[i];
+            return m;
+        };
+        constexpr matrix_type operator-(matrix_type const& other) const noexcept {
+            matrix_type m;
+            for(size_t i = 0; i < rows(); ++i)
+                m[i] = *this[i] - other[i];
+            return m;
+        };
+        constexpr matrix_type operator-() const noexcept {
+            matrix_type m;
+            for(size_t i = 0; i < rows(); ++i)
+                m[i] = -*this[i];
+            return m;
+        };
+        //TODO: Implement for linked matrixes. Currently only squared matrixes supported.
+        constexpr matrix_type operator*(matrix_type const& other) const {
+            matrix_type m;
+            for(size_t r = 0; r < rows(); ++r)
+                for(size_t c = 0; r < columns(); ++c)
+                {
+                    value_type compound = 0;
+                    for(size_t i = 0; i < std::min(rows(), columns()); ++i)
+                        compound += *this[r][i] * other[c][i];
+                    m[r][c] = compound;
+                }
+            return m;
+        };
+        constexpr row_t operator*(column_t const& other)
+        {
+            row_t v{0};
+            for(size_t r = 0; r < std::min(other.size(), rows()); ++r)
+            {
+                value_type compound = 0;
+                for(size_t c = 0; c < std::min(other.size(), rows()); ++ c)
+                    compound = ;
+                v[r] = compound;
+            }
+
+            return v;
+        }
+        constexpr matrix_type operator*(value_type scalar) const noexcept {
+            matrix_type m;
+            for(size_t i = 0; i < rows(); ++i)
+                m[i] = *this[i] * scalar;
+            return m;
+        };
+        constexpr matrix_type operator/(value_type scalar) const noexcept {
+            matrix_type m;
+            for(size_t i = 0; i < rows(); ++i)
+                m[i] = *this[i] / scalar;
+            return m;
+        };
+        constexpr bool operator==(matrix_type const& other) const noexcept {
+            for(size_t i = 0; i < rows(); ++i)
+                if(*this[i] != other[i])
+                    return false;
+            return true;
+        };
+        constexpr bool operator!=(matrix_type const& other) const noexcept  {
+            for(size_t i = 0; i < rows(); ++i)
+                if(*this[i] != other[i])
+                    return true;
+            return false;
+        }
+
+        constexpr matrix_transposed_type transposed() const noexcept
+        {
+            matrix_transposed_type t;
+            for(size_t r = 0; r < rows(); ++r)
+                for(size_t c = 0; c < columns(); ++c)
+                    t[c][r] = *this[r][c];
+            return t;
+        }
+        constexpr void fill(value_type&& v) noexcept {
+            for(size_t i = 0; i < rows(); ++i)
+                *this[i].fill(v);
+        }
+
+        constexpr Matrix() = default;
+        constexpr Matrix(value_type&& v) { fill(v); }
+        constexpr Matrix(value_type v) { fill(v); }
+        constexpr Matrix(array_type&& arr) : Value(arr) {}
+        constexpr Matrix(array_type const& arr) : Value(arr) {}
+
+        constexpr static matrix_type Zero() { return matrix_type(0); }
+        constexpr static matrix_type Identity()
+        {
+            matrix_type m {0};
+            for(size_t i = 0; i < std::min(Rows, Columns); ++i)
+                m[i][i] = 1;
+            return m;
+        }
+
+        inline friend std::ostream& operator<<(std::ostream& stream, matrix_type const& m) noexcept {
+            stream << "{ ";
+            for(size_t i = 0; i < m.rows(); ++i)
+                    stream << (i == 0 ? "" : ", ") << m[i];
+            return stream << " }";
+        }
+    };
+
+    template<typename TNumeric>
+    constexpr Matrix<TNumeric, 3, 3> dim2_scaling(TNumeric&& x, TNumeric&& y) noexcept
+    {
+        return Matrix<TNumeric, 3, 3>{{
+              { x, 0, 0 }
+            , { 0, y, 0 }
+            , { 0, 0, 1 }
+        }};
+    }
+    template<typename TNumeric>
+    constexpr Matrix<TNumeric, 3, 3> dim2_scaling(Vector<TNumeric, 2>&& v) noexcept
+    {
+        return Matrix<TNumeric, 3, 3>{{
+              { v[0], 0, 0 }
+            , { 0, v[1], 0 }
+            , { 0, 0, 1 }
+        }};
+    }
+    template<typename TNumeric>
+    constexpr Matrix<TNumeric, 3, 3> dim2_rotation(double radians) noexcept
+    {
+        auto const cos = std::cos(radians);
+        auto const sin = std::sin(radians);
+        return Matrix<TNumeric, 3, 3>{{
+              { cos, sin, 0 }
+            , { -sin, cos, 0 }
+            , { 0, 0, 1 }
+        }};
+    }
+    template<typename TNumeric>
+    constexpr Matrix<TNumeric, 3, 3> dim2_translation(TNumeric&& x, TNumeric&& y) noexcept
+    {
+        return Matrix<TNumeric, 3, 3>{{
+              { 1, 0, x }
+            , { 0, 1, y }
+            , { 0, 0, 1 }
+        }};
+    }
+    template<typename TNumeric>
+    constexpr Matrix<TNumeric, 3, 3> dim2_translation(Vector<TNumeric, 2>&& v) noexcept
+    {
+        return Matrix<TNumeric, 3, 3>{{
+              { 1, 0, v[0] }
+            , { 0, 1, v[1] }
+            , { 0, 0, 1 }
+        }};
+    }
+    */
+
+    /*
      * @brief SAT implementation in 1-dimensional space for lines.
      * @brief it also can be used as basic check for 1+ dimensional spaces.
      */
     template<typename TNumeric>
-    inline bool collides(
+    constexpr bool collides(
             TNumeric begin0, TNumeric end0
           , TNumeric begin1, TNumeric end1
           , TNumeric& beginOut, TNumeric& endOut
@@ -119,6 +444,40 @@ namespace Utilities::Math
         }
         return collides;
     }
+
+    template<typename TNumeric>
+    struct Range
+    {
+        using value_type = TNumeric;
+        using range_type = Range<value_type>;
+
+        double A, B;
+        constexpr double distance() const noexcept { return B - A; }
+        constexpr bool contains(double x) const noexcept { return x >= A && x <= B; }
+        constexpr bool collides(range_type&& o) const noexcept
+        {
+            value_type _0 { 0 }, _1 { 0 };
+            return Utilities::Math::collides(A, B, o.A, o.B, _0, _1);
+        }
+        constexpr bool collides(range_type&& o, value_type& beginOut, value_type& endOut) const noexcept
+        {
+            return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut);
+        }
+        constexpr bool collides(range_type& o) const noexcept
+        {
+            value_type _0 { 0 }, _1 { 0 };
+            return Utilities::Math::collides(A, B, o.A, o.B, _0, _1);
+        }
+        constexpr bool collides(range_type& o, value_type& beginOut, value_type& endOut) const noexcept
+        {
+            return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut);
+        }
+
+        constexpr range_type operator+(range_type&& o) const noexcept { return { A + o.A, B + o.B }; }
+        constexpr range_type operator+(double x) const noexcept { return { A + x, B + x }; }
+        constexpr bool operator==(range_type&& o) const noexcept { return A == o.A && B == o.B; }
+        constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }
+    };
 }
 
 #define VECTOR2_EXPAND(v) (v).X, (v).Y
