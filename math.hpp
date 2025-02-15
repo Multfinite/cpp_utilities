@@ -454,29 +454,41 @@ namespace Utilities::Math
         double A, B;
         constexpr double distance() const noexcept { return B - A; }
         constexpr bool contains(double x) const noexcept { return x >= A && x <= B; }
-        constexpr bool collides(range_type&& o) const noexcept
-        {
-            value_type _0 { 0 }, _1 { 0 };
-            return Utilities::Math::collides(A, B, o.A, o.B, _0, _1);
-        }
-        constexpr bool collides(range_type&& o, value_type& beginOut, value_type& endOut) const noexcept
-        {
-            return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut);
-        }
-        constexpr bool collides(range_type& o) const noexcept
-        {
-            value_type _0 { 0 }, _1 { 0 };
-            return Utilities::Math::collides(A, B, o.A, o.B, _0, _1);
-        }
-        constexpr bool collides(range_type& o, value_type& beginOut, value_type& endOut) const noexcept
-        {
-            return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut);
-        }
+        constexpr bool collides(range_type&& o) const noexcept { value_type _0 { 0 }, _1 { 0 }; return Utilities::Math::collides(A, B, o.A, o.B, _0, _1); }
+        constexpr bool collides(range_type&& o, value_type& beginOut, value_type& endOut) const noexcept { return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut); }
+        constexpr bool collides(range_type&& o, range_type& out) const noexcept { return Utilities::Math::collides(A, B, o.A, o.B, out.A, out.B); }
+        constexpr bool collides(range_type const& o) const noexcept { value_type _0 { 0 }, _1 { 0 }; return Utilities::Math::collides(A, B, o.A, o.B, _0, _1); }
+        constexpr bool collides(range_type const& o, value_type& beginOut, value_type& endOut) const noexcept { return Utilities::Math::collides(A, B, o.A, o.B, beginOut, endOut); }
+        constexpr bool collides(range_type const& o, range_type& out) const noexcept { return Utilities::Math::collides(A, B, o.A, o.B, out.A, out.B); }
 
         constexpr range_type operator+(range_type&& o) const noexcept { return { A + o.A, B + o.B }; }
         constexpr range_type operator+(double x) const noexcept { return { A + x, B + x }; }
         constexpr bool operator==(range_type&& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }
+    };
+
+    template<typename TNumeric>
+    struct Rectangle
+    {
+        using value_type = TNumeric;
+        using rectangle_type = Rectangle<value_type>;
+        using vector_type = Vector2<value_type>;
+        using range_type = Range<value_type>;
+
+        vector_type BottomLeft, RightTop;
+
+        constexpr Rectangle() = default;
+        constexpr Rectangle(vector_type bottomLeft, vector_type rightTop) : BottomLeft(bottomLeft), RightTop(rightTop) {}
+
+        constexpr range_type x() const noexcept { return range_type{BottomLeft.X, RightTop.X}; }
+        constexpr range_type y() const noexcept { return  range_type{BottomLeft.Y, RightTop.Y}; }
+
+        constexpr vector_type size() const noexcept { return RightTop - BottomLeft; }
+        constexpr bool contains(vector_type point) const noexcept { return x().contains(point.X) && y().contains(point.Y); }
+        constexpr bool collides(rectangle_type&& o) const noexcept { range_type _0, _1; return x().collides(o.x(), _0) && y().collides(o.y(), _1); }
+        constexpr bool collides(rectangle_type&& o, range_type& outX, range_type& outY) const noexcept { return x().collides(o.x(), outX) && y().collides(o.y(), outY); }
+        constexpr bool collides(rectangle_type const& o) const noexcept { range_type _0, _1; return x().collides(o.x(), _0) && y().collides(o.y(), _1); }
+        constexpr bool collides(rectangle_type const& o, range_type& outX, range_type& outY) const noexcept { return x().collides(o.x(), outX) && y().collides(o.y(), outY); }
     };
 }
 
