@@ -59,6 +59,10 @@ namespace Utilities::Math
         inline static vector_type min(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::min(a.X, b.X), std::min(a.Y, b.Y) }; }
         inline static vector_type abs(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::abs(a.X, b.X), std::abs(a.Y, b.Y) }; }
         inline static vector_type compound(vector_type const& a, vector_type const& b) noexcept { return vector_type { a.X * b.X, a.Y * b.Y }; }
+        inline static value_type dot(vector_type const& a, vector_type const& b) noexcept { return (a.X * b.X) + (a.Y * b.Y); }
+        inline static double cos(vector_type const& a, vector_type const& b) noexcept { return dot(a, b) / (a.length() * b.length()); }
+        inline static double angle(vector_type const& a, vector_type const& b) noexcept { return std::acos(cos(a, b)); }
+        inline static double project(vector_type const& a, vector_type const& b) noexcept { return dot(a, b) / b.length(); }
 
         template<typename TValueTypeTo>
         inline static Vector2<TValueTypeTo> static_cast_to(vector_type const& v) noexcept { return Vector2<TValueTypeTo> { static_cast<TValueTypeTo>(v.X), static_cast<TValueTypeTo>(v.Y) }; }
