@@ -456,6 +456,7 @@ namespace Utilities::Math
         using range_type = Range<value_type>;
 
         double A, B;
+        constexpr double center() const noexcept { return (A + B) / 2; }
         constexpr double distance() const noexcept { return B - A; }
         constexpr bool contains(double x) const noexcept { return x >= A && x <= B; }
         constexpr bool collides(range_type&& o) const noexcept { value_type _0 { 0 }, _1 { 0 }; return Utilities::Math::collides(A, B, o.A, o.B, _0, _1); }
