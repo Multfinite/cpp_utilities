@@ -469,6 +469,11 @@ namespace Utilities::Math
         constexpr range_type operator+(range_type&& o) const noexcept { return { A + o.A, B + o.B }; }
         constexpr range_type operator+(range_type const& o) const noexcept { return { A + o.A, B + o.B }; }
         constexpr range_type operator+(double x) const noexcept { return { A + x, B + x }; }
+        constexpr range_type operator-(range_type&& o) const noexcept { return { A - o.A, B - o.B }; }
+        constexpr range_type operator-(range_type const& o) const noexcept { return { A - o.A, B - o.B }; }
+        constexpr range_type operator-(double x) const noexcept { return { A - x, B - x }; }
+        constexpr range_type operator*(double x) const noexcept { return { A * x, B * x }; }
+        constexpr range_type operator/(double x) const noexcept { return { A / x, B / x }; }
         constexpr bool operator==(range_type&& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator==(range_type const& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }        
