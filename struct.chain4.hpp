@@ -81,6 +81,18 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
+        constexpr std::list<ptr_type> seek_direction(value_type const& other, direction_getter_type direction) const noexcept
+        {
+            std::list<ptr_type> path;
+            for(ptr_type w = (this->*direction)(); w != nullptr; w = (w->*direction)())
+            {
+                path.push_back(w);
+                if(w == &other)
+                    return path;
+            }
+            path.clear();
+            return path;
+        }
         constexpr std::list<ptr_type> seek_above(value_type const& other) const noexcept { return seek_direction(other, &self_type::_top); }
         constexpr std::list<ptr_type> seek_below(value_type const& other) const noexcept { return seek_direction(other, &self_type::_bottom); }
         constexpr std::list<ptr_type> seek_at_right(value_type const& other) const noexcept { return seek_direction(other, &self_type::_right); }
@@ -90,6 +102,18 @@ namespace Utilities::Struct
         {
             std::list<ptr_type> path;
             for(ptr_type w = this->*direction; w != nullptr; w = w->*direction)
+            {
+                path.push_back(w);
+                if(pred(w))
+                    return path;
+            }
+            path.clear();
+            return path;
+        }
+        template<typename Pred> constexpr std::list<ptr_type> seek_direction(Pred const& pred, direction_getter_type direction) const noexcept
+        {
+            std::list<ptr_type> path;
+            for(ptr_type w = (this->*direction)(); w != nullptr; w = (w->*direction)())
             {
                 path.push_back(w);
                 if(pred(w))
@@ -108,6 +132,12 @@ namespace Utilities::Struct
         {
             value_type const* w;
             for(w = this; w->*direction != nullptr; w = w->*direction) {}
+            return const_cast<ptr_type>(w);
+        }
+        constexpr ptr_type farest(direction_getter_type direction) const noexcept
+        {
+            value_type const* w;
+            for(w = this; (w->*direction)() != nullptr; w = (w->*direction)()) {}
             return const_cast<ptr_type>(w);
         }
         constexpr ptr_type top_most() const noexcept { return farest(&self_type::_top); }
