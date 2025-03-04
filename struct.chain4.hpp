@@ -98,7 +98,7 @@ namespace Utilities::Struct
         constexpr std::list<ptr_type> seek_at_right(value_type const& other) const noexcept { return seek_direction(other, &self_type::_right); }
         constexpr std::list<ptr_type> seek_at_left(value_type const& other) const noexcept { return seek_direction(other, &self_type::_left); }
 
-        template<typename Pred> constexpr std::list<ptr_type> seek_direction(Pred const& pred, direction_ptr direction) const noexcept
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_direction(Pred const& pred, direction_ptr direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = this->*direction; w != nullptr; w = w->*direction)
@@ -110,7 +110,7 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        template<typename Pred> constexpr std::list<ptr_type> seek_direction(Pred const& pred, direction_getter_type direction) const noexcept
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_direction(Pred const& pred, direction_getter_type direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = (this->*direction)(); w != nullptr; w = (w->*direction)())
@@ -122,10 +122,10 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        template<typename Pred> constexpr std::list<ptr_type> seek_above(Pred const& pred) const noexcept { return seek_direction(pred, &self_type::_top); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_below(Pred const& pred) const noexcept { return seek_direction(pred, &self_type::_bottom); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_at_right(Pred const& pred) const noexcept { return seek_direction(pred, &self_type::_right); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_at_left(Pred const& pred) const noexcept { return seek_direction(pred, &self_type::_left); }
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_above(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_top); }
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_below(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_bottom); }
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_at_right(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_right); }
+        template<typename Pred> constexpr std::list<ptr_type> seek_while_at_left(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_left); }
 
 
         constexpr ptr_type farest(direction_ptr direction) const noexcept
