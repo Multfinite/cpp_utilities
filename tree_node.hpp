@@ -34,6 +34,18 @@ namespace Utilities
         template<typename T>
         constexpr T* parent_as() const noexcept { return static_cast<T*>(_parent); }
 
+        template<typename T>
+        constexpr T* nearest_parent_of() const noexcept
+        {
+            if(_parent)
+            {
+                if(T* p = dynamic_cast<T*>(_parent))
+                    return p;
+                return _parent->nearest_parent_of<T>();
+            }
+            return nullptr;
+        }
+
         auto begin() const { return _chlidrens.begin(); }
         auto end() const { return _chlidrens.end(); }
 
