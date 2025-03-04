@@ -127,7 +127,6 @@ namespace Utilities::Struct
         template<typename Pred> constexpr std::list<ptr_type> seek_while_at_right(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_right); }
         template<typename Pred> constexpr std::list<ptr_type> seek_while_at_left(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_left); }
 
-
         constexpr ptr_type farest(direction_ptr direction) const noexcept
         {
             value_type const* w;
@@ -144,6 +143,23 @@ namespace Utilities::Struct
         constexpr ptr_type bottom_most() const noexcept { return farest(&self_type::_bottom); }
         constexpr ptr_type right_most() const noexcept { return farest(&self_type::_right); }
         constexpr ptr_type left_most() const noexcept { return farest(&self_type::_left); }
+
+        constexpr std::list<ptr_type> all_in_direction(direction_ptr direction) const noexcept
+        {
+            std::list<ptr_type> path;
+            for(ptr_type w = w->*direction; w != nullptr; w = w->*direction) { path.push_back(w); }
+            return path;
+        }
+        constexpr std::list<ptr_type> all_in_direction(direction_getter_type direction) const noexcept
+        {
+            std::list<ptr_type> path;
+            for(ptr_type w = (w->*direction)(); w != nullptr; w = (w->*direction)()) { path.push_back(w); }
+            return path;
+        }
+        constexpr std::list<ptr_type> all_above() const noexcept { return all_in_direction(&self_type::_top); }
+        constexpr std::list<ptr_type> all_below() const noexcept { return all_in_direction(&self_type::_bottom); }
+        constexpr std::list<ptr_type> all_right() const noexcept { return all_in_direction(&self_type::_right); }
+        constexpr std::list<ptr_type> all_left() const noexcept { return all_in_direction(&self_type::_left); }
 
         constexpr bool is_corner(value_type const& a, value_type const& b) const noexcept
         {
