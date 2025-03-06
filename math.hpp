@@ -1,6 +1,10 @@
 #ifndef UTILITIES_MATH_HPP
 #define UTILITIES_MATH_HPP
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#undef _USE_MATH_DEFINES
+
 #include <cmath>
 #include <ostream>
 
@@ -8,6 +12,9 @@
 
 namespace Utilities::Math
 {
+    constexpr double deg2rad = (M_PI / 180);
+    constexpr double rad2deg = (180 / M_PI);
+
     template<typename TNumeric>
     inline TNumeric fraction(TNumeric const& x) noexcept {
         return fraction_inlined(x);
