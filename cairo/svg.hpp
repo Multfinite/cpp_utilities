@@ -1,5 +1,5 @@
-#ifndef RENDERER_SVG_HPP
-#define RENDERER_SVG_HPP
+#ifndef UTILITIES_CAIRO_SVG_HPP
+#define UTILITIES_CAIRO_SVG_HPP
 
 #include <variant>
 
@@ -493,4 +493,4 @@ namespace Utilities::Cairo
     };
 }
 
-#endif // RENDERER_SVG_HPP
+#endif // UTILITIES_CAIRO_SVG_HPP
