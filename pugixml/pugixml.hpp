@@ -42,7 +42,7 @@ namespace Utilities::pugixml
 
     inline pugi::xml_node find_chlid_by_id(pugi::xml_document const& doc, std::string const& id) noexcept
     {
-       inline return doc.find_child([&id](pugi::xml_node const& x) noexcept -> bool {
+       return doc.find_child([&id](pugi::xml_node const& x) noexcept -> bool {
             if(auto attribute = x.attribute("id"))
                 return std::string(attribute.value()) == id;
             return false;
