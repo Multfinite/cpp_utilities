@@ -134,7 +134,6 @@ namespace Utilities::Cairo
     inline __fastcall void draw(RefPtr<Context> context, std::initializer_list<RefPtr<ImageSurface>> surfaces
         , v2d position, double width, double gap = 0, double scale = 1
     ) noexcept {
-        auto layout = Pango::Layout::create(context);
         v2d const size = v2d { 0, std::max(surfaces.size() - 1, size_t(0)) * gap }
                 + std::accumulate(iterator_expand(surfaces), v2d::Zero(), [&](v2d a, RefPtr<ImageSurface> const& x) -> v2d { return a + size_of(x); });
 
