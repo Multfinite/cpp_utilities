@@ -9,12 +9,14 @@ namespace Utilities::Struct
 {
     /*!
      * @brief Structure with 4 linked sides: right, bottom, left, top
+     * @param typename T must be inheriter of Chain4<T>
      */
-    struct Chain4
+    template<typename T> struct Chain4
     {
-        using self_type = Chain4;
-        using value_type = Chain4;
-        using ptr_type = Chain4*;
+        using self_type = Chain4<T>;
+        using value_type = T;
+        using ptr_type = T*;
+        using ptr_const_type = T const*;
     protected:
         ptr_type _top = nullptr; ptr_type _bottom = nullptr; ptr_type _right = nullptr; ptr_type _left = nullptr;
     public:
@@ -23,36 +25,32 @@ namespace Utilities::Struct
         {
             if(_top) _top->_bottom = nullptr;
             _top = value;
-            if(_top) _top->_bottom = this;
+            if(_top) _top->_bottom = static_cast<ptr_type>(this);
         }
-        template<typename T> constexpr T* top_as() const noexcept { return static_cast<T*>(_top); }
 
         constexpr GETTER_V_DEFAULT(bottom, _bottom)
         constexpr SETTER_V(bottom, _bottom)
         {
             if(_bottom) _bottom->_top = nullptr;
             _bottom = value;
-            if(_bottom) _bottom->_top = this;
+            if(_bottom) _bottom->_top = static_cast<ptr_type>(this);
         }
-        template<typename T> constexpr T* bottom_as() const noexcept { return static_cast<T*>(_bottom); }
 
         constexpr GETTER_V_DEFAULT(left, _left)
         constexpr SETTER_V(left, _left)
         {
             if(_left) _left->_right = nullptr;
             _left = value;
-            if(_left) _left->_right = this;
+            if(_left) _left->_right = static_cast<ptr_type>(this);
         }
-        template<typename T> constexpr T* left_as() const noexcept { return static_cast<T*>(_left); }
 
         constexpr GETTER_V_DEFAULT(right, _right)
         constexpr SETTER_V(right, _right)
         {
             if(_right) _right->_left = nullptr;
             _right = value;
-            if(_right) _right->_left = this;
+            if(_right) _right->_left = static_cast<ptr_type>(this);
         }
-        template<typename T> constexpr T* right_as() const noexcept { return static_cast<T*>(_right); }
 
         using direction_ptr = decltype(&self_type::_top);
         using direction_getter_type = decltype(&self_type::top);
@@ -133,15 +131,15 @@ namespace Utilities::Struct
 
         inline ptr_type farest(direction_ptr direction) const noexcept
         {
-            value_type const* w;
-            for(w = this; w->*direction != nullptr; w = w->*direction) {}
-            return const_cast<ptr_type>(w);
+            ptr_type w;
+            for(w = const_cast<ptr_type>(static_cast<ptr_const_type>(this)); w->*direction != nullptr; w = w->*direction) {}
+            return w;
         }
         inline ptr_type farest(direction_getter_type direction) const noexcept
         {
-            value_type const* w;
-            for(w = this; (w->*direction)() != nullptr; w = (w->*direction)()) {}
-            return const_cast<ptr_type>(w);
+            ptr_type w;
+            for(w = const_cast<ptr_type>(static_cast<ptr_const_type>(this)); (w->*direction)() != nullptr; w = (w->*direction)()) {}
+            return w;
         }
         inline ptr_type top_most() const noexcept { return farest(&self_type::_top); }
         inline ptr_type bottom_most() const noexcept { return farest(&self_type::_bottom); }
