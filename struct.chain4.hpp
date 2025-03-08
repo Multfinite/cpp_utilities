@@ -10,12 +10,12 @@ namespace Utilities::Struct
     /*!
      * @brief Structure with 4 linked sides: right, bottom, left, top
      */
-    template<typename T> struct Chain4
+    struct Chain4
     {
-        using self_type = Chain4<T>;
-        using value_type = T;
-        using ptr_type = T*;
-    private:
+        using self_type = Chain4;
+        using value_type = Chain4;
+        using ptr_type = Chain4*;
+    protected:
         ptr_type _top = nullptr; ptr_type _bottom = nullptr; ptr_type _right = nullptr; ptr_type _left = nullptr;
     public:
         constexpr GETTER_V_DEFAULT(top, _top)
@@ -25,6 +25,7 @@ namespace Utilities::Struct
             _top = value;
             if(_top) _top->_bottom = this;
         }
+        template<typename T> constexpr T* top_as() const noexcept { return static_cast<T*>(_top); }
 
         constexpr GETTER_V_DEFAULT(bottom, _bottom)
         constexpr SETTER_V(bottom, _bottom)
@@ -33,6 +34,7 @@ namespace Utilities::Struct
             _bottom = value;
             if(_bottom) _bottom->_top = this;
         }
+        template<typename T> constexpr T* bottom_as() const noexcept { return static_cast<T*>(_bottom); }
 
         constexpr GETTER_V_DEFAULT(left, _left)
         constexpr SETTER_V(left, _left)
@@ -41,6 +43,7 @@ namespace Utilities::Struct
             _left = value;
             if(_left) _left->_right = this;
         }
+        template<typename T> constexpr T* left_as() const noexcept { return static_cast<T*>(_left); }
 
         constexpr GETTER_V_DEFAULT(right, _right)
         constexpr SETTER_V(right, _right)
@@ -49,6 +52,7 @@ namespace Utilities::Struct
             _right = value;
             if(_right) _right->_left = this;
         }
+        template<typename T> constexpr T* right_as() const noexcept { return static_cast<T*>(_right); }
 
         using direction_ptr = decltype(&self_type::_top);
         using direction_getter_type = decltype(&self_type::top);
@@ -69,7 +73,7 @@ namespace Utilities::Struct
         constexpr bool at_right(value_type const& other) const noexcept { return is_on_direction(other, &self_type::_right); }
         constexpr bool at_left(value_type const& other) const noexcept { return is_on_direction(other, &self_type::_left); }
 
-        constexpr std::list<ptr_type> seek_direction(value_type const& other, direction_ptr direction) const noexcept
+        inline std::list<ptr_type> seek_direction(value_type const& other, direction_ptr direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = this->*direction; w != nullptr; w = w->*direction)
@@ -81,7 +85,7 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        constexpr std::list<ptr_type> seek_direction(value_type const& other, direction_getter_type direction) const noexcept
+        inline std::list<ptr_type> seek_direction(value_type const& other, direction_getter_type direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = (this->*direction)(); w != nullptr; w = (w->*direction)())
@@ -93,12 +97,12 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        constexpr std::list<ptr_type> seek_above(value_type const& other) const noexcept { return seek_direction(other, &self_type::_top); }
-        constexpr std::list<ptr_type> seek_below(value_type const& other) const noexcept { return seek_direction(other, &self_type::_bottom); }
-        constexpr std::list<ptr_type> seek_at_right(value_type const& other) const noexcept { return seek_direction(other, &self_type::_right); }
-        constexpr std::list<ptr_type> seek_at_left(value_type const& other) const noexcept { return seek_direction(other, &self_type::_left); }
+        inline std::list<ptr_type> seek_above(value_type const& other) const noexcept { return seek_direction(other, &self_type::_top); }
+        inline std::list<ptr_type> seek_below(value_type const& other) const noexcept { return seek_direction(other, &self_type::_bottom); }
+        inline std::list<ptr_type> seek_at_right(value_type const& other) const noexcept { return seek_direction(other, &self_type::_right); }
+        inline std::list<ptr_type> seek_at_left(value_type const& other) const noexcept { return seek_direction(other, &self_type::_left); }
 
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_direction(Pred const& pred, direction_ptr direction) const noexcept
+        template<typename Pred> inline std::list<ptr_type> seek_while_direction(Pred const& pred, direction_ptr direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = this->*direction; w != nullptr; w = w->*direction)
@@ -110,7 +114,7 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_direction(Pred const& pred, direction_getter_type direction) const noexcept
+        template<typename Pred> inline std::list<ptr_type> seek_while_direction(Pred const& pred, direction_getter_type direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = (this->*direction)(); w != nullptr; w = (w->*direction)())
@@ -122,44 +126,44 @@ namespace Utilities::Struct
             path.clear();
             return path;
         }
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_above(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_top); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_below(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_bottom); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_at_right(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_right); }
-        template<typename Pred> constexpr std::list<ptr_type> seek_while_at_left(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_left); }
+        template<typename Pred> inline std::list<ptr_type> seek_while_above(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_top); }
+        template<typename Pred> inline std::list<ptr_type> seek_while_below(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_bottom); }
+        template<typename Pred> inline std::list<ptr_type> seek_while_at_right(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_right); }
+        template<typename Pred> inline std::list<ptr_type> seek_while_at_left(Pred const& pred) const noexcept { return seek_while_direction(pred, &self_type::_left); }
 
-        constexpr ptr_type farest(direction_ptr direction) const noexcept
+        inline ptr_type farest(direction_ptr direction) const noexcept
         {
             value_type const* w;
             for(w = this; w->*direction != nullptr; w = w->*direction) {}
             return const_cast<ptr_type>(w);
         }
-        constexpr ptr_type farest(direction_getter_type direction) const noexcept
+        inline ptr_type farest(direction_getter_type direction) const noexcept
         {
             value_type const* w;
             for(w = this; (w->*direction)() != nullptr; w = (w->*direction)()) {}
             return const_cast<ptr_type>(w);
         }
-        constexpr ptr_type top_most() const noexcept { return farest(&self_type::_top); }
-        constexpr ptr_type bottom_most() const noexcept { return farest(&self_type::_bottom); }
-        constexpr ptr_type right_most() const noexcept { return farest(&self_type::_right); }
-        constexpr ptr_type left_most() const noexcept { return farest(&self_type::_left); }
+        inline ptr_type top_most() const noexcept { return farest(&self_type::_top); }
+        inline ptr_type bottom_most() const noexcept { return farest(&self_type::_bottom); }
+        inline ptr_type right_most() const noexcept { return farest(&self_type::_right); }
+        inline ptr_type left_most() const noexcept { return farest(&self_type::_left); }
 
-        constexpr std::list<ptr_type> all_in_direction(direction_ptr direction) const noexcept
+        inline std::list<ptr_type> all_in_direction(direction_ptr direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = w->*direction; w != nullptr; w = w->*direction) { path.push_back(w); }
             return path;
         }
-        constexpr std::list<ptr_type> all_in_direction(direction_getter_type direction) const noexcept
+        inline std::list<ptr_type> all_in_direction(direction_getter_type direction) const noexcept
         {
             std::list<ptr_type> path;
             for(ptr_type w = (w->*direction)(); w != nullptr; w = (w->*direction)()) { path.push_back(w); }
             return path;
         }
-        constexpr std::list<ptr_type> all_above() const noexcept { return all_in_direction(&self_type::_top); }
-        constexpr std::list<ptr_type> all_below() const noexcept { return all_in_direction(&self_type::_bottom); }
-        constexpr std::list<ptr_type> all_right() const noexcept { return all_in_direction(&self_type::_right); }
-        constexpr std::list<ptr_type> all_left() const noexcept { return all_in_direction(&self_type::_left); }
+        inline std::list<ptr_type> all_above() const noexcept { return all_in_direction(&self_type::_top); }
+        inline std::list<ptr_type> all_below() const noexcept { return all_in_direction(&self_type::_bottom); }
+        inline std::list<ptr_type> all_right() const noexcept { return all_in_direction(&self_type::_right); }
+        inline std::list<ptr_type> all_left() const noexcept { return all_in_direction(&self_type::_left); }
 
         constexpr bool is_corner(value_type const& a, value_type const& b) const noexcept
         {
@@ -189,7 +193,7 @@ namespace Utilities::Struct
         constexpr bool on_vertical(value_type const& other) const noexcept { return _top == &other || _bottom == &other; }
         constexpr bool on_horizontal(value_type const& other) const noexcept { return _right == &other || _left == &other; }
 
-        constexpr std::list<ptr_type> seek(value_type const& other) const noexcept
+        inline std::list<ptr_type> seek(value_type const& other) const noexcept
         {
             for(auto dir :{
                 &self_type::_bottom
@@ -217,7 +221,7 @@ namespace Utilities::Struct
             return conns;
         }
 
-        static constexpr direction_ptr opposite_of(direction_ptr side) noexcept
+        static inline direction_ptr opposite_of(direction_ptr side) noexcept
         {
             direction_ptr oppositeSide = side;
             for(auto p : {
@@ -230,7 +234,7 @@ namespace Utilities::Struct
                     oppositeSide = p.second;
             return oppositeSide;
         }
-        static constexpr direction_getter_type opposite_of(direction_getter_type side) noexcept
+        static inline direction_getter_type opposite_of(direction_getter_type side) noexcept
         {
             direction_getter_type oppositeSide = side;
             for(auto p : {
@@ -243,7 +247,7 @@ namespace Utilities::Struct
                     oppositeSide = p.second;
             return oppositeSide;
         }
-        static constexpr direction_setter_type opposite_of(direction_setter_type side) noexcept
+        static inline direction_setter_type opposite_of(direction_setter_type side) noexcept
         {
             direction_setter_type oppositeSide = side;
             for(auto p : {
@@ -256,7 +260,7 @@ namespace Utilities::Struct
                     oppositeSide = p.second;
             return oppositeSide;
         }
-        static constexpr direction_getter_type getter_of(direction_setter_type side) noexcept
+        static inline direction_getter_type getter_of(direction_setter_type side) noexcept
         {
             direction_getter_type oppositeSide = side;
             for(auto p : {
@@ -269,7 +273,7 @@ namespace Utilities::Struct
                     oppositeSide = p.second;
             return oppositeSide;
         }
-        static constexpr direction_setter_type setter_of(direction_getter_type side) noexcept
+        static inline direction_setter_type setter_of(direction_getter_type side) noexcept
         {
             direction_setter_type oppositeSide = side;
             for(auto p : {
@@ -283,7 +287,7 @@ namespace Utilities::Struct
             return oppositeSide;
         }
 
-        constexpr void insert(direction_getter_type side, value_type* wp) noexcept
+        inline void insert(direction_getter_type side, value_type* wp) noexcept
         {
             auto setSide = setter_of(side);
             auto oppositeSide = opposite_of(side);
