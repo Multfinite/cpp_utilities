@@ -54,14 +54,14 @@ namespace Utilities::Math
         inline vector_type floor() const noexcept { return vector_type { std::floor(X), std::floor(Y) }; };
 
         inline TNumeric length_squared() const noexcept { return X * X + Y * Y; }
-        inline TNumeric length() const noexcept { return sqrt(length_squared()); }
+        inline TNumeric length() const noexcept { return std::sqrt(length_squared()); }
         inline vector_type normalize() const noexcept
         {
             if(!X && !Y) return *this;
-            TNumeric const length = length();
+            TNumeric const length = this->length();
             return vector_type { X / length, Y / length };
         }
-        
+
         inline static vector_type max(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::max(a.X, b.X), std::max(a.Y, b.Y) }; }
         inline static vector_type min(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::min(a.X, b.X), std::min(a.Y, b.Y) }; }
         inline static vector_type abs(vector_type const& a, vector_type const& b) noexcept { return vector_type { std::abs(a.X, b.X), std::abs(a.Y, b.Y) }; }
@@ -483,7 +483,7 @@ namespace Utilities::Math
         constexpr range_type operator/(double x) const noexcept { return { A / x, B / x }; }
         constexpr bool operator==(range_type&& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator==(range_type const& o) const noexcept { return A == o.A && B == o.B; }
-        constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }        
+        constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }
         constexpr bool operator!=(range_type const& o) const noexcept { return A != o.A || B != o.B; }
     };
 
