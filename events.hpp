@@ -12,7 +12,7 @@ namespace Utilities
 	class Event
 	{
 	public:
-                using CallbackType = std::function<void(TArgs&& ...args)>;
+                using CallbackType = std::function<void(TArgs ...args)>;
 	private:
 		std::list<CallbackType> _callbacks;
 	public:
@@ -37,7 +37,7 @@ namespace Utilities
                     sender_must_be_valid_reference_error() :  std::runtime_error("nullptr was passed.") {}
                 };
 
-                using CallbackType = std::function<void(TObject& sender, TArgs&& ...args)>;
+                using CallbackType = std::function<void(TObject& sender, TArgs ...args)>;
 	private:
                 TObject* _sender;
 		std::list<CallbackType> _callbacks;
@@ -73,11 +73,11 @@ namespace Utilities
 
 		~ObjectEvent() { _callbacks.clear(); }
 
-                inline void operator()(TArgs&& ...args) const noexcept
+                inline void operator()(TArgs ...args) const noexcept
 		{
                     for (auto& callback : _callbacks)
                             callback(*_sender, args...);
-		}
+                }
                 inline void operator+=(CallbackType callback) noexcept { _callbacks.push_back(callback); }
                 inline void operator-=(CallbackType callback) noexcept { _callbacks.remove(callback); }
 	};
