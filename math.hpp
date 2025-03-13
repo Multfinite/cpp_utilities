@@ -485,6 +485,10 @@ namespace Utilities::Math
         constexpr bool operator==(range_type const& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }
         constexpr bool operator!=(range_type const& o) const noexcept { return A != o.A || B != o.B; }
+
+        constexpr Range() noexcept = default;
+        constexpr Range(TNumeric a, TNumeric b) noexcept : A(a), B(b) {}
+        constexpr Range(Range const& r) noexcept : A(r.A), B(r.B) {}
     };
 
     template<typename TNumeric>
