@@ -21,7 +21,7 @@ namespace Utilities
         {
             ObjectEvent<node, vector_type /* old position */> PositionChanged;
 
-            events_t(TreeNode& node) : PositionChanged(node) {}
+            events_t(node& node) : PositionChanged(node) {}
         } Event;
 
         GETTER_V_DEFAULT(global_position, _globalPosition)
