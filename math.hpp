@@ -33,6 +33,7 @@ namespace Utilities::Math
 
         value_type X, Y;
 
+        constexpr vector_type& operator=(vector_type& o) const noexcept { X = o.X; Y = o.Y; return *this; }
         inline vector_type operator+(vector_type const& other) const noexcept { return vector_type { X + other.X, Y + other.Y }; };
         inline vector_type operator-(vector_type const& other) const noexcept { return vector_type { X - other.X, Y - other.Y }; };
         inline vector_type operator-() const noexcept { return vector_type { -X, -Y }; }
@@ -485,6 +486,7 @@ namespace Utilities::Math
         constexpr bool operator==(range_type const& o) const noexcept { return A == o.A && B == o.B; }
         constexpr bool operator!=(range_type&& o) const noexcept { return A != o.A || B != o.B; }
         constexpr bool operator!=(range_type const& o) const noexcept { return A != o.A || B != o.B; }
+        constexpr range_type& operator=(range_type const& o) const noexcept { A = o.A; B = o.B; return *this; }
 
         constexpr Range() noexcept = default;
         constexpr Range(TNumeric a, TNumeric b) noexcept : A(a), B(b) {}
