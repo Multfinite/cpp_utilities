@@ -33,7 +33,7 @@ namespace Utilities::Math
 
         value_type X, Y;
 
-        constexpr vector_type& operator=(vector_type& o) noexcept { X = o.X; Y = o.Y; return *this; }
+        constexpr vector_type& operator=(vector_type const& o) noexcept { X = o.X; Y = o.Y; return *this; }
         inline vector_type operator+(vector_type const& other) const noexcept { return vector_type { X + other.X, Y + other.Y }; };
         inline vector_type operator-(vector_type const& other) const noexcept { return vector_type { X - other.X, Y - other.Y }; };
         inline vector_type operator-() const noexcept { return vector_type { -X, -Y }; }
