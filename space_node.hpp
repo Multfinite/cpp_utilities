@@ -48,7 +48,7 @@ namespace Utilities
             Event.PositionChanged(std::move(old));
         }
     private:
-        decltype(TreeNode::Event.ParentChanged)::subscription_t __onParentChanged;
+        typename decltype(TreeNode::Event.ParentChanged)::subscription_t __onParentChanged;
     public:
         SpaceNode() : TreeNode(), Event(*this)
         {
