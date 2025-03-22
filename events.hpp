@@ -24,20 +24,20 @@ namespace Utilities
         void operator()(TArgs&&... args) const
         {
             for (auto& callback : _callbacks)
-                (*callback)(args...);
+               (*callback)(args...);
         }
 
         callback_ptr operator+=(callback_t&& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            return _callbacks.emplace_back(std::make_shared<callback_t>(callback));
         }
         callback_ptr operator+=(callback_t const& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            return _callbacks.emplace_back(std::make_shared<callback_t>(callback));
         }
         callback_ptr operator+=(callback_ptr&& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            _callbacks.push_back(callback); return callback;
         }
         callback_ptr operator+=(callback_ptr const& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            _callbacks.push_back(callback); return callback;
         }
         void operator-=(callback_ptr&& callback) noexcept {
             _callbacks.remove(callback);
@@ -92,20 +92,20 @@ namespace Utilities
         void operator()(TArgs&&... args) const
         {
             for (auto& callback : _callbacks)
-                (*callback)(*_sender, args...);
+               (*callback)(*_sender, args...);
         }
 
         callback_ptr operator+=(callback_t&& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            return _callbacks.emplace_back(std::make_shared<callback_t>(callback));
         }
         callback_ptr operator+=(callback_t const& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            return _callbacks.emplace_back(std::make_shared<callback_t>(callback));
         }
         callback_ptr operator+=(callback_ptr&& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            _callbacks.push_back(callback); return callback;
         }
         callback_ptr operator+=(callback_ptr const& callback) noexcept {
-            return _callbacks.emplace_back(callback);
+            _callbacks.push_back(callback); return callback;
         }
         void operator-=(callback_ptr&& callback) noexcept {
             _callbacks.remove(callback);
