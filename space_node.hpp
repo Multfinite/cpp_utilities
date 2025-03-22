@@ -47,10 +47,12 @@ namespace Utilities
                     n->set_global_position(n->_globalPosition);
             Event.PositionChanged(std::move(old));
         }
-
+    private:
+        decltype(TreeNode::Event.ParentChanged)::subscription_t __onParentChanged;
+    public:
         SpaceNode() : TreeNode(), Event(*this)
         {
-            TreeNode::Event.ParentChanged += [this](TreeNode& sender, TreeNode* old)
+            __onParentChanged = TreeNode::Event.ParentChanged += [this](TreeNode& sender, TreeNode* old)
             {
                 set_position(_position);
             };
