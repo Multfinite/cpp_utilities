@@ -14,7 +14,7 @@ namespace Utilities
     public:
         struct events_t
         {
-            ObjectEvent<TreeNode, TreeNode* /*old parent */> ParentChanged;
+            event_t<TreeNode, TreeNode* /*old parent */> ParentChanged;
 
             events_t(TreeNode& node) : ParentChanged(node) {}
         } Event;
