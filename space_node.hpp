@@ -19,7 +19,7 @@ namespace Utilities
     public:
         struct events_t
         {
-            ObjectEvent<node, vector_type /* old position */> PositionChanged;
+            event_t<node, vector_type /* old position */> PositionChanged;
 
             events_t(node& node) : PositionChanged(node) {}
         } Event;
@@ -32,8 +32,8 @@ namespace Utilities
             _position = _globalPosition - (parent() ? parent_as<node>()->_globalPosition : vector_type{});
             for(TreeNode* chlid : *this)
                 if(node* n = dynamic_cast<node*>(chlid))
-                    n->set_position(n->_position);
-            Event.PositionChanged(old);
+                    n->set_global_position(n->_globalPosition);
+            Event.PositionChanged(std::move(old));
         }
 
         GETTER_V_DEFAULT(position, _position)
@@ -44,8 +44,8 @@ namespace Utilities
             _globalPosition = _position + (parent() ? parent_as<node>()->_globalPosition : vector_type{});
             for(TreeNode* chlid : *this)
                 if(node* n = dynamic_cast<node*>(chlid))
-                    n->set_position(n->_position);
-            Event.PositionChanged(old);
+                    n->set_global_position(n->_globalPosition);
+            Event.PositionChanged(std::move(old));
         }
 
         SpaceNode() : TreeNode(), Event(*this)
