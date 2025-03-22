@@ -34,10 +34,10 @@ namespace Utilities
             return _callbacks.emplace_back(callback);
         }
         callback_ptr operator+=(callback_ptr&& callback) noexcept {
-            return _callbacks.push_back(callback);
+            return _callbacks.emplace_back(callback);
         }
         callback_ptr operator+=(callback_ptr const& callback) noexcept {
-            return _callbacks.push_back(callback);
+            return _callbacks.emplace_back(callback);
         }
         void operator-=(callback_ptr&& callback) noexcept {
             _callbacks.remove(callback);
@@ -102,10 +102,10 @@ namespace Utilities
             return _callbacks.emplace_back(callback);
         }
         callback_ptr operator+=(callback_ptr&& callback) noexcept {
-            return _callbacks.push_back(callback);
+            return _callbacks.emplace_back(callback);
         }
         callback_ptr operator+=(callback_ptr const& callback) noexcept {
-            return _callbacks.push_back(callback);
+            return _callbacks.emplace_back(callback);
         }
         void operator-=(callback_ptr&& callback) noexcept {
             _callbacks.remove(callback);
