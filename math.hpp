@@ -70,7 +70,11 @@ namespace Utilities::Math
         inline static value_type dot(vector_type const& a, vector_type const& b) noexcept { return (a.X * b.X) + (a.Y * b.Y); }
         inline static double cos(vector_type const& a, vector_type const& b) noexcept { return dot(a, b) / (a.length() * b.length()); }
         inline static double angle(vector_type const& a, vector_type const& b) noexcept { return std::acos(cos(a, b)); }
-        inline static double project(vector_type const& a, vector_type const& b) noexcept { return dot(a, b) / b.length(); }
+        inline static double project(vector_type const& a, vector_type const& b) noexcept
+        {
+            auto const bLength = b.length();
+            return bLength == 0 ? 0 : (dot(a, b) / bLength); // projection of zero vector is zero.
+        }
 
         template<typename TValueTypeTo>
         inline static Vector2<TValueTypeTo> static_cast_to(vector_type const& v) noexcept { return Vector2<TValueTypeTo> { static_cast<TValueTypeTo>(v.X), static_cast<TValueTypeTo>(v.Y) }; }
