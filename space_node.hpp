@@ -15,7 +15,7 @@ namespace Utilities
         */
         using vector_type = TVector;
 
-        vector_type _position, _globalPosition;
+        vector_type _position{}, _globalPosition{};
     public:
         struct events_t
         {
