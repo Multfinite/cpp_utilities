@@ -32,7 +32,7 @@ namespace Utilities
             _position = _globalPosition - (parent() ? parent_as<node>()->_globalPosition : vector_type{});
             for(TreeNode* chlid : *this)
                 if(node* n = dynamic_cast<node*>(chlid))
-                    n->set_global_position(n->_globalPosition);
+                    n->set_position(n->_position);
             Event.PositionChanged(std::move(old));
         }
 
@@ -44,7 +44,7 @@ namespace Utilities
             _globalPosition = _position + (parent() ? parent_as<node>()->_globalPosition : vector_type{});
             for(TreeNode* chlid : *this)
                 if(node* n = dynamic_cast<node*>(chlid))
-                    n->set_global_position(n->_globalPosition);
+                    n->set_position(n->_position);
             Event.PositionChanged(std::move(old));
         }
     private:
