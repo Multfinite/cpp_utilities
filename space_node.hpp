@@ -54,7 +54,7 @@ namespace Utilities
         {
             __onParentChanged = TreeNode::Event.ParentChanged += [this](TreeNode& sender, TreeNode* old)
             {
-                set_position(_position);
+                set_global_position(_globalPosition);
             };
         }
     };
