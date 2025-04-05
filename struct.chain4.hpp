@@ -2,6 +2,7 @@
 #define UTILITIES_STRUCT_CHAIN4_HPP
 
 #include "macro.hpp"
+#include "events.hpp"
 
 #include <list>
 
@@ -20,9 +21,11 @@ namespace Utilities::Struct
     protected:
         ptr_type _top = nullptr; ptr_type _bottom = nullptr; ptr_type _right = nullptr; ptr_type _left = nullptr;
     public:
+        enum struct side_t : uint8_t { Top = 0, Right = 1, Bottom = 2, Left = 3 };
+
         constexpr GETTER_V_DEFAULT(top, _top)
         constexpr SETTER_V(top, _top)
-        {
+        {            
             if(_top) _top->_bottom = nullptr;
             _top = value;
             if(_top) _top->_bottom = static_cast<ptr_type>(this);
@@ -33,7 +36,7 @@ namespace Utilities::Struct
         {
             if(_bottom) _bottom->_top = nullptr;
             _bottom = value;
-            if(_bottom) _bottom->_top = static_cast<ptr_type>(this);
+            if(_bottom) _bottom->_top = static_cast<ptr_type>(this);;
         }
 
         constexpr GETTER_V_DEFAULT(left, _left)
@@ -55,6 +58,7 @@ namespace Utilities::Struct
         using direction_ptr = decltype(&self_type::_top);
         using direction_getter_type = decltype(&self_type::top);
         using direction_setter_type = decltype(&self_type::set_top);
+        struct direction_property { direction_getter_type get; direction_setter_type set; };
 
         constexpr bool is_on_direction(value_type const& other, direction_ptr direction) const noexcept
         {
@@ -283,6 +287,28 @@ namespace Utilities::Struct
                 if(p.first == side)
                     oppositeSide = p.second;
             return oppositeSide;
+        }
+
+        constexpr static direction_property property_of(side_t s) noexcept
+        {
+            switch(s)
+            {
+                case(side_t::Top): return { &self_type::top, &self_type::set_top };
+                case(side_t::Right): return { &self_type::right, &self_type::set_right };
+                case(side_t::Bottom): return { &self_type::bottom, &self_type::set_bottom };
+                case(side_t::Left): return { &self_type::left, &self_type::set_left };
+            }
+        };
+
+        constexpr static side_t opposite_of(side_t s) noexcept
+        {
+            switch(s)
+            {
+                case(side_t::Top): return side_t::Bottom;
+                case(side_t::Right): return side_t::Left;
+                case(side_t::Bottom): return side_t::Top;
+                case(side_t::Left): return side_t::Right;
+            }
         }
 
         inline void insert(direction_getter_type side, value_type* wp) noexcept
