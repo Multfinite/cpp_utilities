@@ -70,6 +70,11 @@ namespace Utilities::Math
         inline static value_type dot(vector_type const& a, vector_type const& b) noexcept { return (a.X * b.X) + (a.Y * b.Y); }
         inline static double cos(vector_type const& a, vector_type const& b) noexcept { return dot(a, b) / (a.length() * b.length()); }
         inline static double angle(vector_type const& a, vector_type const& b) noexcept { return std::acos(cos(a, b)); }
+        /*!
+         * @brief project a vector to vector-axis
+         * @param a Object of projection (value)
+         * @param b Axis vector (project onto this)
+         */
         inline static double project(vector_type const& a, vector_type const& b) noexcept
         {
             auto const bLength = b.length();
