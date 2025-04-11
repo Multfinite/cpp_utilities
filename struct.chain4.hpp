@@ -153,7 +153,7 @@ namespace Utilities::Struct
         inline std::list<ptr_type> all_in_direction(direction_ptr direction) const noexcept
         {
             std::list<ptr_type> path;
-            for(ptr_type w = w->*direction; w != nullptr; w = w->*direction) { path.push_back(w); }
+            for(ptr_type w = this->*direction; w != nullptr; w = w->*direction) { path.push_back(w); }
             return path;
         }
         inline std::list<ptr_type> all_in_direction(direction_getter_type direction) const noexcept
