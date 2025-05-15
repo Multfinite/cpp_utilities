@@ -152,5 +152,10 @@ namespace Utilities::JSON
 
 #define validate_json_object_(item, requiredKeys) Utilities::validate_json_object(__FUNCTION__, __FILE__, __LINE__, item, requiredKeys)
 
+/* https://json.nlohmann.me/features/arbitrary_types/ */
+#define JSON_TYPE_CONVERSION(type) \
+    void to_json(nlohmann::json& j, type const& v); \
+    void from_json(nlohmann::json const& j, type& v); \
+
 #endif // ENABLE_NLOHMANN_JSON
 #endif // UTILITIES_JSON_HPP
