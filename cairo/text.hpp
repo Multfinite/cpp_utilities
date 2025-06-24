@@ -9,15 +9,18 @@ namespace Utilities::Cairo
 {
     struct Text
     {
-        Pango::FontDescription Desc;
+        mutable Pango::FontDescription Desc;
         std::string Value;
         v2d Position;
+        size_t Size;
 
         Text() = default;
-        Text(std::string const& font, size_t size) :
-
-            Desc(Pango::FontDescription(font + " " + std::to_string(size)))
-        {}
+        Text(std::string const& font, size_t size) : Desc(), Size(size)
+        {
+            Desc.set_family(font);
+            Desc.set_absolute_size(PANGO_SCALE * size);
+            Desc.set_weight(Pango::Weight::WEIGHT_NORMAL);
+        }
 
         inline v2d get_size() const noexcept
         {
@@ -42,6 +45,8 @@ namespace Utilities::Cairo
             auto layout = Pango::Layout::create(context);
             context->begin_new_sub_path();
             context->move_to(VECTOR2_EXPAND(pos));
+            Desc.set_absolute_size(PANGO_SCALE * Size * scale);
+            layout->set_font_description(Desc);
             layout->set_text(Value);
             layout->show_in_cairo_context(context);
         }
