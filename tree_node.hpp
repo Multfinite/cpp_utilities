@@ -3,6 +3,7 @@
 
 #include "macro.hpp"
 #include "events.hpp"
+#include "exceptions.hpp"
 #include <list>
 
 namespace Utilities
@@ -24,6 +25,9 @@ namespace Utilities
         constexpr GETTER_V_DEFAULT(parent, _parent)
         SETTER_V(parent, _parent)
         {
+            if(this == value)
+                throw construct_error(Exceptions::invalid_argument_error, "Trying to set self as parent.");
+
             auto* old = _parent;
             if(_parent) _parent->_chlidrens.remove(this);
             _parent = value;
