@@ -27,7 +27,7 @@ namespace Utilities
         GETTER_V_DEFAULT(global_position, _globalPosition)
         SETTER_V(global_position, _globalPosition)
         {
-            auto old = _position;
+            auto old = _globalPosition;
             _globalPosition = value;
             _position = _globalPosition - (parent() ? parent_as<node>()->_globalPosition : vector_type{});
             for(TreeNode* chlid : *this)
