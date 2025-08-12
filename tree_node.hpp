@@ -11,7 +11,7 @@ namespace Utilities
     class TreeNode
     {
         TreeNode* _parent = nullptr;
-        std::list<TreeNode*> _chlidrens;
+        std::list<TreeNode*> _childrens;
     public:
         struct events_t
         {
@@ -50,11 +50,13 @@ namespace Utilities
             return nullptr;
         }
 
-        auto begin() const { return _chlidrens.begin(); }
-        auto end() const { return _chlidrens.end(); }
+        constexpr auto const& childrens() const { return _childrens; }
 
-        auto cbegin() const { return _chlidrens.cbegin(); }
-        auto cend() const { return _chlidrens.cend(); }
+        auto begin() const { return _childrens.begin(); }
+        auto end() const { return _childrens.end(); }
+
+        auto cbegin() const { return _childrens.cbegin(); }
+        auto cend() const { return _childrens.cend(); }
 
         TreeNode() : Event(*this) {}
         virtual ~TreeNode() {} // need to use dynamic_cast
