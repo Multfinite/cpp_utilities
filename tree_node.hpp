@@ -29,9 +29,9 @@ namespace Utilities
                 throw construct_error(Exceptions::invalid_argument_error, "Trying to set self as parent.");
 
             auto* old = _parent;
-            if(_parent) _parent->_chlidrens.remove(this);
+            if(_parent) _parent->_childrens.remove(this);
             _parent = value;
-            if(_parent) _parent->_chlidrens.push_back(this);
+            if(_parent) _parent->_childrens.push_back(this);
             Event.ParentChanged(std::move(old));
         }
 
