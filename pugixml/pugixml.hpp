@@ -71,6 +71,15 @@ namespace Utilities::pugixml
         return doc;
     }
     inline pugi::xml_document load_xml(std::string const& fileName) { return load_xml(fs::path(Utilities::absolute(fileName))); }
+
+    inline void copy_document(pugi::xml_document const& src, pugi::xml_document& dst)
+    {
+        dst.reset();
+        pugi::xml_node root = src.root();
+        if (root)
+            dst.append_copy(root);
+    }
+
 }
 
 #endif // UTILITIES_PUGIXML_PUGIXML_HPP
