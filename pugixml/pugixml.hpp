@@ -74,10 +74,9 @@ namespace Utilities::pugixml
 
     inline void copy_document(pugi::xml_document const& src, pugi::xml_document& dst)
     {
-        dst.reset();
-        pugi::xml_node root = src.root();
-        if (root)
-            dst.append_copy(root);
+        doc2.reset();
+        for (pugi::xml_node node : doc1.children())
+            doc2.append_copy(node);
     }
 
 }
