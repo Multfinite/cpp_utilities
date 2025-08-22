@@ -122,7 +122,6 @@ namespace Utilities::Pathfinding
                 {
                     enqueue(ways, t); enqueue(ways, f);
                     check(edge, edgeNode, f, fNode, t, tNode);
-                    if(&f != &from) check(edge, edgeNode, t, tNode, f, fNode);
                 }
                 else
                 {
