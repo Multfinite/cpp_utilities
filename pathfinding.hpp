@@ -87,12 +87,14 @@ namespace Utilities::Pathfinding
         {
             std::list<std::reference_wrapper<path_entry>> path;
             vertex_node_type* v = const_cast<vertex_node_type*>(this);
-            /*
-             * NOTE: there are no protection against call with the same vertex in pathfinding (like `operator()(v, v)`)
-             * as result it will cause endless cycle with memory allocation!
-            */
-            while (v->Entry.has_value())
+            std::list<vertex_type const*> seen;
+
+            while(v->Entry.has_value())
             {
+                if(std::find(seen.begin(), seen.end(), std::addressof(v->Owner)) != seen.end())
+                    throw construct_error(Exceptions::invalid_state_error, "Cycle detected.");
+                seen.push_back(std::addressof(v->Owner));
+
                 path_entry& entry = v->Entry.value();
                 path.push_front(entry); // Current node is destination. Then: N; N-1 N; N-2 N-1 N; ... ; 0 1 2 ... N-2 N-1 N.
                 v = entry.From.__linking.template as_ptr<vertex_node_type>(this->Index);
@@ -106,8 +108,8 @@ namespace Utilities::Pathfinding
             //Entry = nullopt;
         }
 
-        inline bool operator==(vertex_node_type const& other) const { return &this == &other; }
-        inline bool operator!=(vertex_node_type const& other) const { return &this != &other; }
+        inline bool operator==(vertex_node_type const& other) const { return this == std::addressof(other); }
+        inline bool operator!=(vertex_node_type const& other) const { return this != std::addressof(other); }
     };
 
     template<typename TEdge, typename TCostType = double>
