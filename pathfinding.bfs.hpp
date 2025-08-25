@@ -14,7 +14,8 @@ namespace Utilities::Pathfinding
     template<
         typename TGraph,
         typename TCostEvaluator,
-        typename TCostType = double
+        typename TCostType = double,
+        bool strictBFS = false
     >
 #if HAS_CONCEPTS
     requires
@@ -83,13 +84,16 @@ namespace Utilities::Pathfinding
             const cost_type fullCost = fNodeCost + edgeNode.Cost.value();
             if (!tNode.Entry.has_value())
                 tNode.Entry.emplace(f, edge, fullCost);
-            else if (fullCost < tNode.Entry.value().Cost)
-                tNode.Entry.value().Cost = fullCost;
+            else if (!strictBFS && fullCost < tNode.Entry.value().Cost)
+                tNode.Entry.emplace(f, edge, fullCost);
         }
     public:
         template<typename TPathType = typename vertex_node_type::path_type_default>
         TPathType operator()(vertex_type const& from, vertex_type const& to)
         {
+            if(std::addressof(from) == std::addressof(to))
+                return TPathType{};
+
             vertex_node_type& toNode = GraphNode.node_of(to);
             vertex_node_type& fromNode = GraphNode.node_of(from);
             fromNode.Entry = nullopt;
@@ -111,6 +115,11 @@ namespace Utilities::Pathfinding
 
                 vertex_type const& t = edge.To;
                 vertex_node_type& tNode = GraphNode.node_of(t);
+
+                if(edgeNode.State == ProcessingState::Explored)
+                    throw construct_error(Exceptions::invalid_state_error, "Trying to handle explored edge!");
+                edgeNode.State = ProcessingState::Explored;
+
 #if VERBOSE_PF == 1
                 cout
                         << hex << &f << dec << "    " //<< f.Context
@@ -119,22 +128,9 @@ namespace Utilities::Pathfinding
                         << endl;
 #endif
 
-                if(edge_type::Bidirectional)
-                {
-                    enqueue(ways, t); enqueue(ways, f);
-                    check(edge, edgeNode, f, fNode, t, tNode);
-                    if(&f != &from) check(edge, edgeNode, t, tNode, f, fNode);
-                }
-                else
-                {
-                    enqueue(ways, t);
-                    check(edge, edgeNode, f, fNode, t, tNode);
-                }
-
-                edgeNode.State = ProcessingState::Explored;
+                check(edge, edgeNode, f, fNode, t, tNode);
+                enqueue(ways, t);
             }
-            if(&from == &to)
-                toNode.Entry = nullopt;
             return toNode.template Build<TPathType>();
         }
     };
