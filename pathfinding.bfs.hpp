@@ -95,6 +95,14 @@ namespace Utilities::Pathfinding
                 return TPathType{};
 
             vertex_node_type& toNode = GraphNode.node_of(to);
+
+            (*this)(from);
+
+            return toNode.template Build<TPathType>();
+        }
+
+        void operator()(vertex_type const& from)
+        {
             vertex_node_type& fromNode = GraphNode.node_of(from);
             fromNode.Entry = nullopt;
 #if VERBOSE_PF == 1
@@ -131,7 +139,6 @@ namespace Utilities::Pathfinding
                 check(edge, edgeNode, f, fNode, t, tNode);
                 enqueue(ways, t);
             }
-            return toNode.template Build<TPathType>();
         }
     };
 }
